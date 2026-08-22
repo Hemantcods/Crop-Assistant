@@ -1,0 +1,270 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Enums
+
+enum CropStatus{
+  ACTIVE
+  HARVESTED
+  FAILED
+}
+enum SoilRecordSource{
+  MANULAL
+  SOIL_REPORT
+  SENSOR
+}
+
+enum DiagnosisStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum AlertType {
+  DISEASE
+  WEATHER
+  CROP_HEALTH
+  IRRIGATION
+  GENERAL
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+// USER MODEL
+model User{
+  id        String  @id @default(uuid())
+  name      String
+  phone     String? @unique
+  email     String  @unique
+  passwordHash  String?
+  googleId  String? @unique 
+  language  String @default("en")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+
+  farms Farm[]
+  alerts Alert[]
+  notificationPreference NotificationPreference?
+  @@index([email])
+  @@index([phone])
+}
+
+// Farm Model
+
+model Farm{
+  id String @id @default(uuid())
+  userId  String
+  name  String
+  latitide Decimal @db.Decimal(9,6)
+  longitude Decimal  @db.Decimal(9,6)
+  area  Decimal @db.Decimal(12,4)
+  areaUnit String @default("acre")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  crops Crop[]
+  soilRecords SoilRecord[]
+  weatherSnapShots  WeatherSnapShot[]
+  recommendations CropRecomendation[]
+
+  @@index([userId])
+}
+
+model Crop {
+  id String @id @default(uuid())
+  farmId String
+  name String
+  variety String
+  platedAt DateTime
+  harvestedAt DateTime?
+  status  CropStatus @default(ACTIVE)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+
+  farm  Farm   @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  images  CropImage[]
+  diagnoses Diagnosis[]
+  monitoringRecords  MonitoringRecord[]
+  alerts  Alert[]
+
+  @@index([farmId])
+  @@index([farmId,status])
+}
+
+// CropImage Model
+model CropImage{
+  id String @id @default(uuid())
+  cropId  String
+  url String
+  uploadedAt DateTime @default(now())
+
+  crop  Crop @relation(fields:[cropId],references:[id],onDelete:Cascade)
+
+  diagnoses Diagnosis[]
+
+  @@index([cropId])
+}
+
+
+// Diagnosis Model
+model Diagnosis{
+  id String @id @default(uuid())
+  cropId  String
+  imageId String
+  disease String?
+  confidence  Decimal? @db.Decimal(5,4)
+  modelVersion  String?
+  status DiagnosisStatus @default(PENDING)
+  createdAt DateTime  @default(now())
+
+
+  crop Crop @relation(fields:[cropId],references:[id],onDelete:Cascade)
+  image CropImage @relation(fields:[imageId],references:[id],onDelete:Cascade)
+  alerts Alert[]
+
+  @@index([cropId])
+  @@index([imageId])
+  @@index([cropId,createdAt])
+
+}
+
+// Soil Record
+
+model SoilRecord{
+  id String @id @default(uuid())
+  farmId  String
+  nitrogen Decimal?  @db.Decimal(10, 2)
+  phosphorous Decimal?  @db.Decimal(10, 2)
+  potassium Decimal?   @db.Decimal(10, 2)
+  ph  Decimal?   @db.Decimal(4, 2)
+  source SoilRecordSource
+  createdAt DateTime @default(now())
+
+  farm Farm @relation(fields:[farmId],references:[id],onDelete:Cascade)
+
+  @@index([farmId])
+  @@index([farmId,createdAt])
+}
+
+// Weather SnapShot
+model WeatherSnapShot{
+  id String  @id @default(uuid())
+  farmId String
+  temperature  Decimal? @db.Decimal(6,2)
+  humidity  Decimal? @db.Decimal(5, 2)
+  rainfall  Decimal? @db.Decimal(8,2)
+  recordedAt DateTime
+  farm Farm @relation(fields:[farmId],references:[id],onDelete:Cascade)
+
+  @@index([farmId])
+  @@index([farmId,recordedAt])
+}
+
+// Crop Recomendation
+
+model CropRecomendation{
+  id String @id @default(uuid())
+  farmId  String
+  modelVersion  String
+  createdAt DateTime @default(now())
+
+  farm Farm @relation(fields:[farmId],references:[id],onDelete:Cascade)
+  items CropRecomendationItem[]
+
+  @@index([farmId])
+  @@index([farmId,createdAt])
+}
+
+// Crop Recomendation System
+
+model CropRecomendationItem{
+  id String @id @default(uuid())
+  recomendationId String
+  cropName  String
+  score Decimal @db.Decimal(5,4)
+  rank Int
+  recomendation CropRecomendation @relation(fields:[recomendationId],references:[id],onDelete:Cascade)
+
+  @@index([recomendationId])
+  @@unique([recomendationId,rank])
+}
+
+// Monitoring Record
+
+model MonitoringRecord {
+  id          String   @id @default(uuid())
+  cropId      String
+  healthScore Decimal? @db.Decimal(5, 2)
+  growthStage String?
+  notes       String?
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+
+  crop Crop @relation(fields: [cropId], references: [id], onDelete: Cascade)
+
+  @@index([cropId])
+  @@index([cropId, createdAt])
+}
+
+// Alert
+
+
+
+model Alert {
+  id         String        @id @default(uuid())
+  userId     String
+  cropId     String?
+  diagnosisId String?
+  type       AlertType
+  severity   AlertSeverity
+  title      String
+  message    String
+  readAt     DateTime?
+  createdAt  DateTime      @default(now())
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  crop      Crop?      @relation(fields: [cropId], references: [id], onDelete: Cascade)
+  diagnosis Diagnosis? @relation(fields: [diagnosisId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, readAt])
+  @@index([cropId])
+  @@index([diagnosisId])
+  @@index([userId, createdAt])
+}
+
+// notification Preference
+
+
+
+model NotificationPreference {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  whatsappEnabled   Boolean  @default(false)
+  diseaseAlerts     Boolean  @default(true)
+  weatherAlerts     Boolean  @default(true)
+  cropHealthAlerts  Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
