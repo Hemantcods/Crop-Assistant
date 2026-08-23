@@ -3,19 +3,13 @@ import express from "express";
 import { env } from "./config/env";
 import cors from "cors";
 import routes from "./routes";
-import path from "path";
 const app = express();
-
 app.use(express.json());
 app.use(cookieParser());
-app.use(
-  cors({
+app.use(cors({
     origin: env.FRONTEND_URL.replace(/\/$/, ""),
     credentials: true,
-  }),
-);
-app.use("/uploads", express.static(path.resolve(process.cwd(), "uploads")));
-
+}));
 app.use("/api/", routes);
-
 export default app;
+//# sourceMappingURL=app.js.map

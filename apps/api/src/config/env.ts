@@ -19,7 +19,9 @@ const envSchema = z.object({
   REFRESH_TOKEN_EXPIRES_IN: z.string().default("7d"),
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
-  GOOGLE_CALLBACK_URL:z.string(),
+  GOOGLE_CALLBACK_URL: z.string(),
+  API_PUBLIC_URL: z.url(),
+  ML_SERVICE_URL: z.url(),
 });
 
 export const env = envSchema.parse(process.env);
