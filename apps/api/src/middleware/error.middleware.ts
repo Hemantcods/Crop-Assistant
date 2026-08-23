@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { ZodError } from "zod";
+import z, { ZodError } from "zod";
 import { AppError } from "../errors/AppError";
 
 export const errorHandler = (
@@ -13,7 +13,7 @@ export const errorHandler = (
     return res.status(200).json({
       success: false,
       message: "Validation Failed",
-      errors: error.flatten(),
+      errors: z.treeifyError(error),
     });
   }
   // App errors
