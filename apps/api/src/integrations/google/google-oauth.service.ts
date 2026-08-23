@@ -30,7 +30,7 @@ export class GoogleOAuthService {
 
     return {
       googleId: payload.sub,
-      email: payload.sub,
+      email: payload.email,
       name: payload.name,
     };
   }
