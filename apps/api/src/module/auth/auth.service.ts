@@ -48,6 +48,21 @@ export class AuthService {
     const refreshToken = this.tokenService.generateRefreshToken(user.id);
     return { user: this.sanitizeUser(user), accessToken, refreshToken };
   }
+  async refreshTokens(refreshToken: string) {
+    let payload;
+    try {
+      payload = this.tokenService.verifyRefreshToken(refreshToken);
+    } catch {
+      throw new AppError("Invalid or expired refresh token", 401);
+    }
+    const user = await this.authRepository.findUserById(payload.userId);
+    if (!user) {
+      throw new AppError("User not found", 404);
+    }
+    const accessToken = this.tokenService.generateAccessToken(user.id);
+    const newRefreshToken = this.tokenService.generateRefreshToken(user.id);
+    return { accessToken, refreshToken: newRefreshToken };
+  }
   async getMe(userId: string) {
     const user = await this.authRepository.findUserById(userId);
     if (!user) {
