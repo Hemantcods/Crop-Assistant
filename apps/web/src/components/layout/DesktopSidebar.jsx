@@ -3,11 +3,10 @@ import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useSettings } from '../../context/SettingsContext';
 import { useAlerts } from '../../context/AlertsContext';
-import { Sparkles } from 'lucide-react';
 
 export const DesktopSidebar = () => {
   const { user } = useAuth();
-  const { t, setIsUpgradeModalOpen } = useSettings();
+  const { t } = useSettings();
   const { unreadCount } = useAlerts();
 
   const navItems = [
@@ -77,17 +76,6 @@ export const DesktopSidebar = () => {
           </NavLink>
         ))}
       </nav>
-
-      {/* Upgrade CTA Footer */}
-      <div className="p-4 mt-auto border-t border-outline-variant/60">
-        <button
-          onClick={() => setIsUpgradeModalOpen(true)}
-          className="w-full py-3.5 px-4 bg-primary text-on-primary rounded-xl font-label-md text-label-md hover:bg-primary-container hover:text-on-primary-container transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer group"
-        >
-          <Sparkles className="w-4 h-4 text-[#FFD54F] group-hover:rotate-12 transition-transform" />
-          <span>{t('nav.upgrade')}</span>
-        </button>
-      </div>
     </aside>
   );
 };

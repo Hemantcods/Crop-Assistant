@@ -299,14 +299,15 @@ export const MOCK_ALERTS = [
   },
   {
     id: "alt-3",
-    type: "market",
-    title: "Mandi Price Alert: Sharbati Wheat UP by ₹120/Qtl",
-    desc: "Current modal price at Pune APMC is ₹2,850/Quintal (+4.2% week-on-week).",
+    type: "field",
+    title: "Nutrient Top-Dressing Window Open",
+    desc: "Wheat field at active stem elongation: apply recommended Nitrogen booster before next irrigation.",
     severity: "info",
     time: "1 day ago",
     isRead: true,
-    actionText: "View Mandi Trends",
-    icon: "trending_up"
+    cropId: "wheat",
+    actionText: "View wheat field",
+    icon: "energy_savings_leaf"
   },
   {
     id: "alt-4",

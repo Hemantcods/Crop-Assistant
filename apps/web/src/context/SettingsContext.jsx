@@ -6,7 +6,6 @@ const SettingsContext = createContext();
 export const SettingsProvider = ({ children }) => {
   const [language, setLanguage] = useState(() => localStorage.getItem('cropcare_lang') || 'en');
   const [units, setUnits] = useState(() => localStorage.getItem('cropcare_units') || 'Acres / Celsius');
-  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [whatsappSettings, setWhatsappSettings] = useState(() => {
     const saved = localStorage.getItem('cropcare_whatsapp');
     if (saved) {
@@ -69,8 +68,6 @@ export const SettingsProvider = ({ children }) => {
         setUnits,
         whatsappSettings,
         toggleWhatsappSetting,
-        isUpgradeModalOpen,
-        setIsUpgradeModalOpen,
         t,
       }}
     >

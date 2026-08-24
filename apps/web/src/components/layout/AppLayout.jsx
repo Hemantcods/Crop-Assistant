@@ -3,7 +3,6 @@ import { Outlet } from 'react-router-dom';
 import { DesktopSidebar } from './DesktopSidebar';
 import { MobileTopBar } from './MobileTopBar';
 import { MobileBottomNav } from './MobileBottomNav';
-import { UpgradeModal } from './UpgradeModal';
 import { WeatherModal } from './WeatherModal';
 
 export const AppLayout = () => {
@@ -26,7 +25,6 @@ export const AppLayout = () => {
       <MobileBottomNav />
 
       {/* Global Modals */}
-      <UpgradeModal />
       <WeatherModal />
     </div>
   );

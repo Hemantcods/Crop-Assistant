@@ -108,6 +108,9 @@ export const generateAgriculturalAdvisory = (currentWeather, forecastDays = []) 
  * Reverse geocodes coordinates to city/state/country via OpenWeather Geocoding API
  */
 export const reverseGeocodeCoords = async (lat, lon) => {
+  if (lat === undefined || lon === undefined) return null;
+
+  // 1. Try OpenWeather Reverse Geocoding
   try {
     const res = await axios.get(`${GEO_URL}/reverse`, {
       params: {
@@ -116,7 +119,7 @@ export const reverseGeocodeCoords = async (lat, lon) => {
         limit: 1,
         appid: API_KEY,
       },
-      timeout: 5000,
+      timeout: 4000,
     });
     if (res.data && res.data.length > 0) {
       const place = res.data[0];
@@ -128,9 +131,135 @@ export const reverseGeocodeCoords = async (lat, lon) => {
       };
     }
   } catch (err) {
-    console.warn('[Reverse Geocode Notice]:', err.message);
+    console.warn('[Reverse Geocode OpenWeather Notice]:', err.message);
   }
+
+  // 2. Try OpenStreetMap Nominatim Reverse Geocoding (super reliable for any coordinates)
+  try {
+    const nomRes = await axios.get('https://nominatim.openstreetmap.org/reverse', {
+      params: {
+        lat,
+        lon,
+        format: 'json',
+        addressdetails: 1,
+      },
+      headers: {
+        'Accept-Language': 'en',
+      },
+      timeout: 4000,
+    });
+    if (nomRes.data && nomRes.data.address) {
+      const addr = nomRes.data.address;
+      const name =
+        addr.village ||
+        addr.town ||
+        addr.city ||
+        addr.suburb ||
+        addr.county ||
+        addr.state_district ||
+        'Local Field';
+      return {
+        name,
+        state: addr.state || '',
+        country: addr.country_code ? addr.country_code.toUpperCase() : 'IN',
+      };
+    }
+  } catch (err2) {
+    console.warn('[Reverse Geocode Nominatim Notice]:', err2.message);
+  }
+
   return null;
+};
+
+/**
+ * Searches locations using OpenWeather Geocoding direct API + OpenStreetMap Nominatim fallback
+ * Returns array of { name, state, country, displayName, lat, lon, source }
+ */
+export const searchLocations = async (query) => {
+  if (!query || typeof query !== 'string' || query.trim().length < 2) {
+    return [];
+  }
+
+  const cleanQuery = query.trim();
+  const results = [];
+  const seenCoords = new Set();
+
+  // 1. Try OpenWeather Direct Geocoding API first
+  try {
+    const owRes = await axios.get(`${GEO_URL}/direct`, {
+      params: {
+        q: cleanQuery,
+        limit: 5,
+        appid: API_KEY,
+      },
+      timeout: 5000,
+    });
+
+    if (owRes.data && Array.isArray(owRes.data)) {
+      owRes.data.forEach((item) => {
+        const coordKey = `${Number(item.lat).toFixed(3)},${Number(item.lon).toFixed(3)}`;
+        if (!seenCoords.has(coordKey)) {
+          seenCoords.add(coordKey);
+          const stateStr = item.state ? `${item.state}, ` : '';
+          results.push({
+            name: item.name,
+            state: item.state || '',
+            country: item.country || 'IN',
+            displayName: `${item.name}, ${stateStr}${item.country || 'IN'}`,
+            lat: item.lat,
+            lon: item.lon,
+            source: 'openweather',
+          });
+        }
+      });
+    }
+  } catch (err) {
+    console.warn('[OpenWeather Geocoding Direct Notice]:', err.message);
+  }
+
+  // 2. Query OpenStreetMap Nominatim for detailed villages/tehsils/districts in India & abroad
+  try {
+    const nomRes = await axios.get('https://nominatim.openstreetmap.org/search', {
+      params: {
+        q: cleanQuery,
+        format: 'json',
+        addressdetails: 1,
+        limit: 6,
+      },
+      headers: {
+        'Accept-Language': 'en',
+      },
+      timeout: 5000,
+    });
+
+    if (nomRes.data && Array.isArray(nomRes.data)) {
+      nomRes.data.forEach((item) => {
+        const lat = parseFloat(item.lat);
+        const lon = parseFloat(item.lon);
+        const coordKey = `${lat.toFixed(3)},${lon.toFixed(3)}`;
+        if (!seenCoords.has(coordKey)) {
+          seenCoords.add(coordKey);
+          const addr = item.address || {};
+          const name = addr.village || addr.town || addr.city || addr.suburb || addr.county || item.name || cleanQuery;
+          const state = addr.state || '';
+          const country = addr.country_code ? addr.country_code.toUpperCase() : 'IN';
+          results.push({
+            name,
+            state,
+            country,
+            displayName: item.display_name,
+            lat,
+            lon,
+            source: 'nominatim',
+          });
+        }
+      });
+    }
+  } catch (err2) {
+    console.warn('[Nominatim Geocoding Notice]:', err2.message);
+  }
+
+  return results;
 };
 
 /**
@@ -226,11 +355,44 @@ export const transformOpenWeatherData = (currentRes, forecastRes, extraGeo = nul
       iconUrl: `https://openweathermap.org/img/wn/${fcIconCode}@2x.png`,
       rain: `${rainPercent}%`,
       rainProb: `${rainPercent}%`,
+      rainPercent,
       alert: hasRainAlert,
       hasRainAlert,
       condition: midItem.weather?.[0]?.description || 'Partly cloudy',
     };
   });
+
+  const todayForecast = forecast[0] || {
+    date: todayDateStr,
+    day: 'Today',
+    temp: `${temp}°C / ${temp - 5}°C`,
+    maxTemp: temp,
+    minTemp: temp - 5,
+    icon: currentIcon,
+    iconUrl: `https://openweathermap.org/img/wn/${iconCode}@2x.png`,
+    rain: '10%',
+    rainProb: '10%',
+    rainPercent: 10,
+    alert: false,
+    hasRainAlert: false,
+    condition: condition,
+  };
+
+  const tomorrowForecast = forecast[1] || {
+    date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
+    day: 'Tomorrow',
+    temp: `${temp}°C / ${temp - 6}°C`,
+    maxTemp: temp,
+    minTemp: temp - 6,
+    icon: 'partly_cloudy_day',
+    iconUrl: 'https://openweathermap.org/img/wn/02d@2x.png',
+    rain: '15%',
+    rainProb: '15%',
+    rainPercent: 15,
+    alert: false,
+    hasRainAlert: false,
+    condition: 'Partly cloudy',
+  };
 
   const recommendation = generateAgriculturalAdvisory(currentRes, forecast);
 
@@ -258,6 +420,8 @@ export const transformOpenWeatherData = (currentRes, forecastRes, extraGeo = nul
     uvIndex: uvObj.label,
     uvValue: uvObj.value,
     clouds: `${currentRes.clouds?.all || 0}%`,
+    today: todayForecast,
+    tomorrow: tomorrowForecast,
     forecast,
     recommendation,
     lastUpdated: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -267,8 +431,13 @@ export const transformOpenWeatherData = (currentRes, forecastRes, extraGeo = nul
 
 export const weatherService = {
   /**
+   * Search locations (cities, towns, villages, districts) with geocoding
+   */
+  searchLocations,
+
+  /**
    * Fetches live weather and forecast from OpenWeatherMap API
-   * @param {string|{lat: number, lon: number, isCurrentLocation?: boolean}} query Location name or coordinates object
+   * @param {string|{lat: number, lon: number, isCurrentLocation?: boolean, name?: string, state?: string, country?: string}} query Location name or coordinates object
    */
   async getCurrentWeather(query = 'Pune,IN') {
     let params = {
@@ -278,17 +447,53 @@ export const weatherService = {
 
     let cacheKey;
     let isCoords = false;
+    let resolvedGeo = null;
 
-    if (typeof query === 'object' && query !== null && query.lat && query.lon) {
+    if (typeof query === 'object' && query !== null && query.lat !== undefined && query.lon !== undefined) {
       isCoords = true;
-      params.lat = query.lat;
-      params.lon = query.lon;
-      cacheKey = `${WEATHER_CACHE_KEY_PREFIX}${query.lat.toFixed(2)}_${query.lon.toFixed(2)}`;
+      const latNum = parseFloat(query.lat);
+      const lonNum = parseFloat(query.lon);
+      params.lat = latNum;
+      params.lon = lonNum;
+      resolvedGeo = {
+        name: query.name,
+        state: query.state,
+        country: query.country,
+        lat: latNum,
+        lon: lonNum,
+        isCurrentLocation: !!query.isCurrentLocation,
+        source: query.source || (query.isCurrentLocation ? 'gps' : 'coords'),
+      };
+      cacheKey = `${WEATHER_CACHE_KEY_PREFIX}${latNum.toFixed(2)}_${lonNum.toFixed(2)}`;
 
     } else {
       const cityQuery = typeof query === 'string' && query.trim() ? query.trim() : 'Pune,IN';
-      params.q = cityQuery;
-      cacheKey = `${WEATHER_CACHE_KEY_PREFIX}${cityQuery.toLowerCase()}`;
+
+      // Attempt to resolve city / village via geocoding first for high precision
+      try {
+        const geoMatches = await searchLocations(cityQuery);
+        if (geoMatches && geoMatches.length > 0) {
+          const match = geoMatches[0];
+          isCoords = true;
+          params.lat = match.lat;
+          params.lon = match.lon;
+          resolvedGeo = {
+            name: match.name,
+            state: match.state,
+            country: match.country,
+            lat: match.lat,
+            lon: match.lon,
+            source: 'search',
+          };
+          cacheKey = `${WEATHER_CACHE_KEY_PREFIX}${Number(match.lat).toFixed(2)}_${Number(match.lon).toFixed(2)}`;
+        } else {
+          params.q = cityQuery;
+          cacheKey = `${WEATHER_CACHE_KEY_PREFIX}${cityQuery.toLowerCase()}`;
+        }
+      } catch {
+        params.q = cityQuery;
+        cacheKey = `${WEATHER_CACHE_KEY_PREFIX}${cityQuery.toLowerCase()}`;
+      }
     }
 
     // Check LocalStorage cache first
@@ -297,7 +502,6 @@ export const weatherService = {
       if (cached) {
         const parsed = JSON.parse(cached);
         if (parsed.timestamp && Date.now() - parsed.timestamp < CACHE_TTL_MS) {
-          // If query marked as current location, ensure flag is preserved
           if (query?.isCurrentLocation && parsed.data) {
             parsed.data.isCurrentLocation = true;
           }
@@ -314,19 +518,20 @@ export const weatherService = {
         axios.get(`${BASE_URL}/forecast`, { params, timeout: 8000 }),
       ];
 
-      // If coordinates query, simultaneously get reverse geocoded details
-      if (isCoords) {
+      // If coordinates query and place name missing, reverse geocode
+      if (isCoords && (!resolvedGeo?.name || !resolvedGeo?.state)) {
         requests.push(reverseGeocodeCoords(params.lat, params.lon));
       }
 
       const [currentRes, forecastRes, geoDetails] = await Promise.all(requests);
 
       const extraGeo = {
+        ...(resolvedGeo || {}),
         ...(geoDetails || {}),
-        lat: params.lat,
-        lon: params.lon,
+        lat: params.lat ?? currentRes.data.coord?.lat,
+        lon: params.lon ?? currentRes.data.coord?.lon,
         isCurrentLocation: !!query?.isCurrentLocation,
-        source: query?.source || (isCoords ? 'gps' : 'search'),
+        source: query?.source || (isCoords ? (query?.isCurrentLocation ? 'gps' : 'search') : 'search'),
       };
 
       const formattedData = transformOpenWeatherData(currentRes.data, forecastRes.data, extraGeo);
@@ -362,6 +567,14 @@ export const weatherService = {
       }
 
       // Final fallback to structured live baseline
+      const fallbackForecast = [
+        { day: 'Today', temp: '28°C / 19°C', maxTemp: 28, minTemp: 19, icon: 'partly_cloudy_day', rain: '20%', rainProb: '20%', rainPercent: 20, condition: 'Partly cloudy', alert: false, hasRainAlert: false },
+        { day: 'Tomorrow', temp: '25°C / 18°C', maxTemp: 25, minTemp: 18, icon: 'rainy', rain: '65%', rainProb: '65%', rainPercent: 65, condition: 'Scattered showers', alert: true, hasRainAlert: true },
+        { day: 'Day 3', temp: '27°C / 18°C', maxTemp: 27, minTemp: 18, icon: 'partly_cloudy_day', rain: '30%', rainProb: '30%', rainPercent: 30, condition: 'Partly cloudy', alert: false, hasRainAlert: false },
+        { day: 'Day 4', temp: '29°C / 19°C', maxTemp: 29, minTemp: 19, icon: 'sunny', rain: '10%', rainProb: '10%', rainPercent: 10, condition: 'Sunny', alert: false, hasRainAlert: false },
+        { day: 'Day 5', temp: '30°C / 20°C', maxTemp: 30, minTemp: 20, icon: 'sunny', rain: '5%', rainProb: '5%', rainPercent: 5, condition: 'Clear Sky', alert: false, hasRainAlert: false },
+      ];
+
       return {
         city: 'Pune, Maharashtra, IN',
         rawCity: 'Pune',
@@ -381,13 +594,9 @@ export const weatherService = {
         visibility: '10.0 km',
         uvIndex: '6 (Moderate)',
         uvValue: 6,
-        forecast: [
-          { day: 'Today', temp: '28°C / 19°C', icon: 'partly_cloudy_day', rain: '20%', alert: false },
-          { day: 'Tomorrow', temp: '25°C / 18°C', icon: 'rainy', rain: '65%', alert: true },
-          { day: 'Day 3', temp: '27°C / 18°C', icon: 'partly_cloudy_day', rain: '30%', alert: false },
-          { day: 'Day 4', temp: '29°C / 19°C', icon: 'sunny', rain: '10%', alert: false },
-          { day: 'Day 5', temp: '30°C / 20°C', icon: 'sunny', rain: '5%', alert: false },
-        ],
+        today: fallbackForecast[0],
+        tomorrow: fallbackForecast[1],
+        forecast: fallbackForecast,
         recommendation: 'Microclimate is stable. Good window for scheduled nutrient feeding, weeding, and crop inspection.',
         lastUpdated: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now(),
@@ -411,68 +620,103 @@ export const weatherService = {
 
   /**
    * Detects user's location via HTML5 Geolocation (GPS) with automatic IP-based fallback
-   * Returns { lat, lon, source: 'gps' | 'ip', city?: string, region?: string, country?: string }
+   * Returns { lat, lon, source: 'gps' | 'ip' | 'default', city?: string, region?: string, country?: string }
    */
   async detectUserLocation() {
-    // 1. Try HTML5 Geolocation first (most accurate for mobile / GPS-enabled devices)
+    // 1. Try HTML5 Geolocation first (GPS / WiFi triangulation) with fast timeout
     if (typeof navigator !== 'undefined' && navigator.geolocation) {
       try {
         const position = await new Promise((resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(resolve, reject, {
-            timeout: 8000,
-            enableHighAccuracy: true,
-            maximumAge: 30000,
-          });
+          navigator.geolocation.getCurrentPosition(
+            (pos) => resolve(pos),
+            (err) => reject(err),
+            {
+              timeout: 5000,
+              enableHighAccuracy: false,
+              maximumAge: 60000,
+            }
+          );
         });
 
         if (position && position.coords) {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          const geoInfo = await reverseGeocodeCoords(lat, lon);
+
           return {
-            lat: position.coords.latitude,
-            lon: position.coords.longitude,
-            accuracy: position.coords.accuracy,
+            lat,
+            lon,
+            city: geoInfo?.name || 'My Location',
+            region: geoInfo?.state || '',
+            country: geoInfo?.country || 'IN',
             source: 'gps',
           };
         }
       } catch (geoErr) {
-        console.info('[Geolocation GPS Notice]:', geoErr.message, 'Falling back to IP geolocation.');
+        console.info('[Geolocation GPS Notice]:', geoErr.message, 'Trying fast IP location fallback.');
       }
     }
 
-    // 2. IP Geolocation Fallback (works across desktop / when GPS permission is denied)
+    // 2. Fast IP Geolocation Provider 1: ipwho.is
     try {
-      const ipRes = await axios.get('https://ipwho.is/', { timeout: 6000 });
+      const ipRes = await axios.get('https://ipwho.is/', { timeout: 4000 });
       if (ipRes.data && ipRes.data.success !== false && ipRes.data.latitude && ipRes.data.longitude) {
         return {
           lat: ipRes.data.latitude,
           lon: ipRes.data.longitude,
-          city: ipRes.data.city,
-          region: ipRes.data.region,
-          country: ipRes.data.country_code || ipRes.data.country,
+          city: ipRes.data.city || 'My Location',
+          region: ipRes.data.region || '',
+          country: ipRes.data.country_code || ipRes.data.country || 'IN',
           source: 'ip',
         };
       }
     } catch (ipErr) {
-      console.warn('[IP Location Fallback Notice]:', ipErr.message);
+      console.warn('[IP Location Provider 1 Notice]:', ipErr.message);
     }
 
-    // Secondary IP fallback
+    // 3. Fast IP Geolocation Provider 2: freeipapi.com
     try {
-      const ipapiRes = await axios.get('https://ipapi.co/json/', { timeout: 6000 });
+      const freeRes = await axios.get('https://freeipapi.com/api/json', { timeout: 4000 });
+      if (freeRes.data && freeRes.data.latitude && freeRes.data.longitude) {
+        return {
+          lat: freeRes.data.latitude,
+          lon: freeRes.data.longitude,
+          city: freeRes.data.cityName || 'My Location',
+          region: freeRes.data.regionName || '',
+          country: freeRes.data.countryCode || 'IN',
+          source: 'ip',
+        };
+      }
+    } catch (freeErr) {
+      console.warn('[IP Location Provider 2 Notice]:', freeErr.message);
+    }
+
+    // 4. Fast IP Geolocation Provider 3: ipapi.co
+    try {
+      const ipapiRes = await axios.get('https://ipapi.co/json/', { timeout: 4000 });
       if (ipapiRes.data && ipapiRes.data.latitude && ipapiRes.data.longitude) {
         return {
           lat: ipapiRes.data.latitude,
           lon: ipapiRes.data.longitude,
-          city: ipapiRes.data.city,
-          region: ipapiRes.data.region,
-          country: ipapiRes.data.country_code || ipapiRes.data.country_name,
+          city: ipapiRes.data.city || 'My Location',
+          region: ipapiRes.data.region || '',
+          country: ipapiRes.data.country_code || ipapiRes.data.country_name || 'IN',
           source: 'ip',
         };
       }
-    } catch (err2) {
-      console.warn('[Secondary IP Fallback Notice]:', err2.message);
+    } catch (err3) {
+      console.warn('[IP Location Provider 3 Notice]:', err3.message);
     }
 
-    throw new Error('Unable to detect location via GPS or Network IP.');
+    // 5. Default safe baseline (Pune, Maharashtra) - never throws so the UI never crashes
+    return {
+      lat: 18.5204,
+      lon: 73.8567,
+      city: 'Pune',
+      region: 'Maharashtra',
+      country: 'IN',
+      source: 'default',
+    };
   },
 
   /**
@@ -483,6 +727,9 @@ export const weatherService = {
     return this.getCurrentWeather({
       lat: loc.lat,
       lon: loc.lon,
+      name: loc.city,
+      state: loc.region,
+      country: loc.country,
       isCurrentLocation: true,
       source: loc.source,
     });
@@ -501,7 +748,10 @@ export const weatherService = {
         alerts = MOCK_ALERTS;
       }
     }
-    return alerts;
+    // Filter out any legacy market/mandi alerts
+    return alerts.filter(
+      (a) => a.type !== 'market' && !a.title?.toLowerCase().includes('mandi')
+    );
   },
 
   /**

@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal } from '../common/Modal';
 import { useAlerts } from '../../context/AlertsContext';
+import { useCrops } from '../../context/CropContext';
+import { searchLocations } from '../../services/weatherService';
 import {
   CloudRain,
   Wind,
@@ -14,6 +16,8 @@ import {
   Compass,
   Navigation,
   Radio,
+  LandPlot,
+  Loader2,
 } from 'lucide-react';
 
 export const WeatherModal = () => {
@@ -30,21 +34,96 @@ export const WeatherModal = () => {
     detectLocationAndRefresh,
   } = useAlerts();
 
+  const { farms } = useCrops();
+
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [isQueryingGeo, setIsQueryingGeo] = useState(false);
   const [geoError, setGeoError] = useState(null);
+
+  // Debounced search for location autocompletion
+  useEffect(() => {
+    if (!searchQuery.trim() || searchQuery.trim().length < 2) {
+      setSuggestions([]);
+      setIsQueryingGeo(false);
+      return;
+    }
+
+    let isMounted = true;
+    setIsQueryingGeo(true);
+    const timer = setTimeout(async () => {
+      try {
+        const matches = await searchLocations(searchQuery.trim());
+        if (isMounted) {
+          setSuggestions(matches);
+          setIsQueryingGeo(false);
+        }
+      } catch {
+        if (isMounted) {
+          setSuggestions([]);
+          setIsQueryingGeo(false);
+        }
+      }
+    }, 300);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+    };
+  }, [searchQuery]);
 
   if (!weather) return null;
 
-  const popularCities = ['Pune', 'Nashik', 'Nagpur', 'Kolhapur', 'Aurangabad', 'Solapur', 'Indore', 'Ludhiana'];
+  const popularCities = [
+    'Pune',
+    'Baramati',
+    'Nashik',
+    'Nagpur',
+    'Kolhapur',
+    'Solapur',
+    'Aurangabad',
+    'Indore',
+    'Ludhiana',
+    'Jaipur',
+  ];
+
+  const handleSelectSuggestion = async (item) => {
+    setGeoError(null);
+    setSearchQuery('');
+    setSuggestions([]);
+    setIsSearching(false);
+    await setLocationAndRefresh({
+      name: item.name,
+      state: item.state,
+      country: item.country,
+      lat: item.lat,
+      lon: item.lon,
+    });
+  };
+
+  const handleSelectFarm = async (farm) => {
+    setGeoError(null);
+    setIsSearching(false);
+    await setLocationAndRefresh({
+      name: farm.name,
+      lat: farm.latitude ?? 18.5204,
+      lon: farm.longitude ?? 73.8567,
+    });
+  };
 
   const handleSearchSubmit = async (e) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
     setGeoError(null);
-    await setLocationAndRefresh(searchQuery.trim());
-    setIsSearching(false);
-    setSearchQuery('');
+    if (suggestions.length > 0) {
+      await handleSelectSuggestion(suggestions[0]);
+    } else {
+      await setLocationAndRefresh(searchQuery.trim());
+      setIsSearching(false);
+      setSearchQuery('');
+      setSuggestions([]);
+    }
   };
 
   const handleSelectCity = async (city) => {
@@ -87,7 +166,7 @@ export const WeatherModal = () => {
               }`}
             >
               <Navigation className={`w-3.5 h-3.5 ${isDetectingLocation ? 'animate-spin text-primary' : isUsingCurrentLocation ? 'text-primary fill-primary/30' : 'text-primary'}`} />
-              <span>{isDetectingLocation ? 'Locating...' : isUsingCurrentLocation ? 'Current Location' : 'Use My Location'}</span>
+              <span>{isDetectingLocation ? 'Locating GPS...' : isUsingCurrentLocation ? 'GPS Location' : 'Use My GPS'}</span>
               {isUsingCurrentLocation && (
                 <span className="w-2 h-2 rounded-full bg-primary animate-pulse ml-0.5" />
               )}
@@ -99,7 +178,7 @@ export const WeatherModal = () => {
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-colors cursor-pointer border border-outline-variant/60"
             >
               <Search className="w-3.5 h-3.5 text-on-surface-variant" />
-              <span>Search City</span>
+              <span>Select Location</span>
             </button>
           </div>
 
@@ -121,7 +200,7 @@ export const WeatherModal = () => {
           </div>
         </div>
 
-        {/* Location Search Bar Dropdown */}
+        {/* Location Search Bar & Autocomplete Panel */}
         {isSearching && (
           <div className="p-3.5 bg-surface-container-low rounded-2xl border border-outline-variant flex flex-col gap-3 animate-fadeIn">
             <button
@@ -131,35 +210,88 @@ export const WeatherModal = () => {
               className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-primary text-on-primary rounded-xl text-xs font-semibold hover:opacity-95 transition-opacity cursor-pointer shadow-xs"
             >
               <Compass className={`w-4 h-4 ${isDetectingLocation ? 'animate-spin' : ''}`} />
-              <span>{isDetectingLocation ? 'Detecting GPS Location...' : '📍 Detect & Use My Current Location (GPS / Network)'}</span>
+              <span>{isDetectingLocation ? 'Detecting GPS Coordinates...' : '📍 Use My Exact GPS Location'}</span>
             </button>
+
+            {/* Farm Plots Quick Selection */}
+            {farms && farms.length > 0 && (
+              <div className="flex flex-col gap-1.5 pt-1">
+                <span className="text-[10px] uppercase font-bold text-on-surface-variant flex items-center gap-1">
+                  <LandPlot className="w-3 h-3 text-primary" /> My Registered Farm Plots:
+                </span>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {farms.map((f) => (
+                    <button
+                      key={f.id}
+                      type="button"
+                      onClick={() => handleSelectFarm(f)}
+                      className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-surface border border-outline-variant/70 hover:border-primary text-on-surface hover:text-primary transition-all flex items-center gap-1 cursor-pointer"
+                    >
+                      <MapPin className="w-3 h-3 text-primary" />
+                      <span>{f.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="flex items-center gap-2">
               <span className="h-[1px] flex-1 bg-outline-variant/60" />
-              <span className="text-[10px] uppercase font-bold text-on-surface-variant">or search city</span>
+              <span className="text-[10px] uppercase font-bold text-on-surface-variant">or search town / village</span>
               <span className="h-[1px] flex-1 bg-outline-variant/60" />
             </div>
 
-            <form onSubmit={handleSearchSubmit} className="flex gap-2">
+            <form onSubmit={handleSearchSubmit} className="flex gap-2 relative">
               <div className="relative flex-1">
                 <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Enter city, district or village (e.g. Pune, Nashik)..."
-                  className="w-full pl-8.5 pr-3 py-1.5 text-xs bg-surface rounded-xl border border-outline-variant focus:outline-none focus:border-primary text-on-surface"
+                  placeholder="Type city, village or district (e.g. Baramati, Nashik)..."
+                  className="w-full pl-8.5 pr-8 py-2 text-xs bg-surface rounded-xl border border-outline-variant focus:outline-none focus:border-primary text-on-surface"
                   autoFocus
                 />
+                {isQueryingGeo && (
+                  <Loader2 className="w-3.5 h-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-primary animate-spin" />
+                )}
               </div>
               <button
                 type="submit"
-                className="px-3.5 py-1.5 bg-surface-container-highest text-on-surface text-xs font-semibold rounded-xl hover:bg-surface-variant transition-colors cursor-pointer border border-outline-variant"
+                className="px-3.5 py-2 bg-primary text-on-primary text-xs font-semibold rounded-xl hover:bg-on-primary-fixed-variant transition-colors cursor-pointer"
               >
                 Search
               </button>
             </form>
 
+            {/* Live Autocomplete Suggestions List */}
+            {suggestions.length > 0 && (
+              <div className="bg-surface rounded-xl border border-outline-variant shadow-sm overflow-hidden flex flex-col divide-y divide-outline-variant/40 max-h-48 overflow-y-auto">
+                {suggestions.map((item, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleSelectSuggestion(item)}
+                    className="p-2.5 text-left hover:bg-surface-container-high transition-colors flex items-center justify-between gap-2 cursor-pointer group"
+                  >
+                    <div className="flex items-center gap-2 overflow-hidden">
+                      <MapPin className="w-3.5 h-3.5 text-primary shrink-0 group-hover:scale-110 transition-transform" />
+                      <div className="truncate">
+                        <p className="text-xs font-bold text-on-surface truncate">{item.name}</p>
+                        <p className="text-[10px] text-on-surface-variant truncate">
+                          {item.state ? `${item.state}, ` : ''}{item.country || 'IN'}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-mono text-on-surface-variant/70 shrink-0">
+                      {item.lat.toFixed(2)}°, {item.lon.toFixed(2)}°
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Popular Agricultural Regions */}
             <div className="flex items-center gap-1.5 flex-wrap pt-1">
               <span className="text-[10px] uppercase font-bold text-on-surface-variant">Popular:</span>
               {popularCities.map((c) => (
@@ -180,65 +312,121 @@ export const WeatherModal = () => {
           </div>
         )}
 
-        {/* Current Weather Card */}
-        <div className="bg-gradient-to-br from-[#E1F5FE] via-surface-container-low to-[#FFF8E1] border border-outline-variant rounded-2xl p-5 flex items-center justify-between shadow-xs relative overflow-hidden">
-          {/* Subtle location source tag */}
-          <div className="absolute top-2.5 right-3 flex items-center gap-1 text-[10px] font-semibold text-primary">
-            {isUsingCurrentLocation ? (
-              <span className="flex items-center gap-1 bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">
-                <Radio className="w-2.5 h-2.5 text-primary animate-pulse" />
-                Live Location
-              </span>
-            ) : (
-              <span className="bg-surface-container-high px-2 py-0.5 rounded-full text-on-surface-variant border border-outline-variant/60">
-                Custom City
-              </span>
-            )}
-          </div>
+        {/* Today vs Tomorrow Quick Comparison Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* TODAY'S CARD */}
+          <div className="bg-gradient-to-br from-[#E1F5FE] via-surface-container-low to-surface-container-lowest border border-[#0288D1]/30 rounded-2xl p-4 flex flex-col justify-between shadow-xs">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="px-2 py-0.5 bg-[#0288D1] text-white rounded-full text-[10px] font-bold uppercase tracking-wider">
+                  Today (Live)
+                </span>
+                {isUsingCurrentLocation && (
+                  <span className="flex items-center gap-1 text-[10px] text-primary font-semibold">
+                    <Radio className="w-2.5 h-2.5 animate-pulse" /> GPS
+                  </span>
+                )}
+              </div>
 
-          <div>
-            <div className="flex items-baseline gap-1">
-              <span className="text-4xl font-extrabold text-primary tracking-tight">
-                {weather.temp}°C
-              </span>
-            </div>
-            <p className="font-semibold text-sm text-on-surface mt-1 flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-[20px] text-primary">
-                {weather.icon || 'partly_cloudy_day'}
-              </span>
-              <span>{weather.condition}</span>
-            </p>
-            <p className="text-xs text-on-surface-variant mt-0.5">
-              Feels like {weather.feelsLike ?? weather.temp}°C • {weather.humidityStatus || 'Normal Humidity'}
-            </p>
-            {weather.coord && (
-              <p className="text-[10px] text-on-surface-variant/80 font-mono mt-1">
-                📍 {weather.coord.lat.toFixed(2)}°, {weather.coord.lon.toFixed(2)}°
+              <div className="mt-2 flex items-baseline gap-2">
+                <span className="text-3xl font-extrabold text-primary">
+                  {weather.temp}°C
+                </span>
+                <span className="text-xs text-on-surface-variant font-medium">
+                  ({weather.today?.temp || `${weather.temp}°C / ${weather.temp - 5}°C`})
+                </span>
+              </div>
+
+              <p className="text-xs font-semibold text-on-surface mt-0.5 flex items-center gap-1.5 capitalize">
+                <span className="material-symbols-outlined text-[18px] text-[#0288D1]">
+                  {weather.icon || 'partly_cloudy_day'}
+                </span>
+                <span>{weather.condition}</span>
               </p>
-            )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 mt-3 pt-2.5 border-t border-outline-variant/50 text-[11px]">
+              <div className="flex items-center gap-1 text-on-surface-variant">
+                <Droplets className="w-3.5 h-3.5 text-[#0288D1]" />
+                <span>{weather.humidity}</span>
+              </div>
+              <div className="flex items-center gap-1 text-on-surface-variant">
+                <Wind className="w-3.5 h-3.5 text-secondary" />
+                <span>{weather.wind}</span>
+              </div>
+              <div className="flex items-center gap-1 text-on-surface-variant">
+                <Sun className="w-3.5 h-3.5 text-[#F57F17]" />
+                <span>UV {weather.uvIndex?.split(' ')?.[0] || '6'}</span>
+              </div>
+              <div className="flex items-center gap-1 text-on-surface-variant">
+                <CloudRain className="w-3.5 h-3.5 text-[#006C48]" />
+                <span>Rain {weather.today?.rain || '10%'}</span>
+              </div>
+            </div>
           </div>
 
-          <div className="text-right flex flex-col gap-1.5 text-xs text-on-surface-variant mt-3">
-            <div className="flex items-center gap-1.5 justify-end">
-              <Droplets className="w-3.5 h-3.5 text-[#0288D1]" />
-              <span className="font-medium">Humidity: {weather.humidity}</span>
+          {/* TOMORROW'S CARD */}
+          <div className={`border rounded-2xl p-4 flex flex-col justify-between shadow-xs ${
+            weather.tomorrow?.hasRainAlert || (weather.tomorrow?.rainPercent >= 50)
+              ? 'bg-gradient-to-br from-[#FFF8E1] via-surface-container-low to-surface-container-lowest border-[#FFD54F]'
+              : 'bg-gradient-to-br from-[#E8F5E9] via-surface-container-low to-surface-container-lowest border-[#A5D6A7]'
+          }`}>
+            <div>
+              <div className="flex items-center justify-between">
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                  weather.tomorrow?.hasRainAlert || (weather.tomorrow?.rainPercent >= 50)
+                    ? 'bg-[#E65100] text-white'
+                    : 'bg-primary text-on-primary'
+                }`}>
+                  Tomorrow
+                </span>
+                {(weather.tomorrow?.hasRainAlert || (weather.tomorrow?.rainPercent >= 50)) && (
+                  <span className="px-1.5 py-0.5 bg-[#FFECB3] text-[#E65100] rounded text-[10px] font-bold animate-pulse">
+                    Rain Alert
+                  </span>
+                )}
+              </div>
+
+              <div className="mt-2 flex items-baseline gap-2">
+                <span className="text-3xl font-extrabold text-on-surface">
+                  {weather.tomorrow?.temp ? weather.tomorrow.temp.split(' / ')[0] : '25°C'}
+                </span>
+                <span className="text-xs text-on-surface-variant font-medium">
+                  (Min: {weather.tomorrow?.temp ? weather.tomorrow.temp.split(' / ')[1] : '18°C'})
+                </span>
+              </div>
+
+              <p className="text-xs font-semibold text-on-surface mt-0.5 flex items-center gap-1.5 capitalize">
+                <span className="material-symbols-outlined text-[18px] text-primary">
+                  {weather.tomorrow?.icon || 'partly_cloudy_day'}
+                </span>
+                <span>{weather.tomorrow?.condition || 'Partly cloudy'}</span>
+              </p>
             </div>
-            <div className="flex items-center gap-1.5 justify-end">
-              <Wind className="w-3.5 h-3.5 text-secondary" />
-              <span className="font-medium">Wind: {weather.wind}</span>
-            </div>
-            <div className="flex items-center gap-1.5 justify-end">
-              <Sun className="w-3.5 h-3.5 text-[#F57F17]" />
-              <span className="font-medium">UV: {weather.uvIndex}</span>
+
+            <div className="mt-3 pt-2.5 border-t border-outline-variant/50 flex flex-col gap-1 text-[11px]">
+              <div className="flex items-center justify-between">
+                <span className="text-on-surface-variant flex items-center gap-1">
+                  <CloudRain className="w-3.5 h-3.5 text-[#0288D1]" /> Rain Chance:
+                </span>
+                <strong className={weather.tomorrow?.hasRainAlert ? 'text-[#E65100]' : 'text-primary'}>
+                  {weather.tomorrow?.rain || '20%'}
+                </strong>
+              </div>
+              <p className="text-[10px] text-on-surface-variant line-clamp-2 leading-tight mt-0.5">
+                {weather.tomorrow?.hasRainAlert || (weather.tomorrow?.rainPercent >= 50)
+                  ? 'Rain expected. Clear furrows and pause foliar spraying.'
+                  : 'Favorable conditions. Excellent for scheduled field work.'}
+              </p>
             </div>
           </div>
         </div>
 
-        {/* 5-Day Forecast */}
+        {/* 5-Day Extended Forecast */}
         <div>
           <div className="flex items-center justify-between mb-2.5">
             <h4 className="font-semibold text-sm text-on-surface">
-              5-Day Micro-Climate Forecast
+              5-Day Detailed Weather Forecast
             </h4>
             <span className="text-[11px] text-on-surface-variant font-medium">OpenWeather Live</span>
           </div>

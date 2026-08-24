@@ -21,7 +21,7 @@ export const AlertsPage = () => {
   const { alerts, markAsRead, dismissAlert } = useAlerts();
   const { addToast } = useToast();
 
-  const [activeTab, setActiveTab] = useState('ALL'); // 'ALL' | 'weather' | 'disease' | 'market'
+  const [activeTab, setActiveTab] = useState('ALL'); // 'ALL' | 'weather' | 'disease'
 
   const filteredAlerts = alerts.filter((a) => {
     if (activeTab === 'ALL') return true;
@@ -52,7 +52,7 @@ export const AlertsPage = () => {
             Farm Alerts & Advisories
           </h1>
           <p className="font-body-md text-body-md text-on-surface-variant text-sm mt-1">
-            Real-time weather warnings, regional disease outbreaks, and agricultural market advisories.
+            Real-time weather warnings, regional disease outbreaks, and field crop advisories.
           </p>
         </div>
       </div>
@@ -63,7 +63,6 @@ export const AlertsPage = () => {
           { id: 'ALL', label: 'All Alerts' },
           { id: 'weather', label: 'Weather Warnings' },
           { id: 'disease', label: 'Disease & Pests' },
-          { id: 'market', label: 'Mandi Prices' },
         ].map((tab) => (
           <button
             key={tab.id}

@@ -22,7 +22,6 @@ export const TRANSLATIONS = {
       diagnose: "Diagnose",
       alerts: "Alerts",
       profile: "Profile",
-      upgrade: "Upgrade to Premium",
     },
     dashboard: {
       greeting: "Good morning, Sagar",
@@ -135,7 +134,6 @@ export const TRANSLATIONS = {
       diagnose: "जाँच (AI)",
       alerts: "अलर्ट",
       profile: "प्रोफाइल",
-      upgrade: "प्रीमियम में अपग्रेड करें",
     },
     dashboard: {
       greeting: "शुभ प्रभात, सागर",
