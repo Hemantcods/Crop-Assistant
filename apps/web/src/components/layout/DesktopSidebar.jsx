@@ -13,7 +13,7 @@ export const DesktopSidebar = () => {
     { to: '/', label: t('nav.home'), icon: 'home', exact: true },
     { to: '/crops', label: t('nav.crops'), icon: 'potted_plant' },
     { to: '/diagnose', label: t('nav.diagnose'), icon: 'biotech' },
-    { to: '/alerts', label: t('nav.alerts'), icon: 'notifications', badge: unreadCount },
+    { to: '/notification', label: t('nav.alerts'), icon: 'notifications', badge: unreadCount },
     { to: '/profile', label: t('nav.profile'), icon: 'person' },
   ];
 
