@@ -24,16 +24,27 @@ export const AlertsProvider = ({ children }) => {
   const [isAlertsDrawerOpen, setIsAlertsDrawerOpen] = useState(false);
   const [isWeatherModalOpen, setIsWeatherModalOpen] = useState(false);
 
-  // Fetch weather for a manual city name
+  // Fetch weather for a manual city name or coordinates object
   const fetchWeather = useCallback(async (location = weatherLocation) => {
     setIsLoadingWeather(true);
     setLocationError(null);
     try {
-      const weatherData = await weatherService.getCurrentWeather(location);
+      let locParam = location;
+      if (typeof location === 'string' && location.startsWith('{')) {
+        try {
+          locParam = JSON.parse(location);
+        } catch {
+          locParam = location;
+        }
+      }
+      const weatherData = await weatherService.getCurrentWeather(locParam);
       setWeather(weatherData);
-      if (typeof location === 'string') {
-        localStorage.setItem('cropcare_weather_location', location);
-        setWeatherLocation(location);
+      if (weatherData?.city) {
+        setWeatherLocation(weatherData.city);
+        localStorage.setItem(
+          'cropcare_weather_location',
+          typeof location === 'object' ? JSON.stringify(location) : weatherData.city
+        );
       }
       return weatherData;
     } catch (err) {
@@ -96,13 +107,16 @@ export const AlertsProvider = ({ children }) => {
     fetchAlertsAndWeather();
   }, [fetchAlertsAndWeather]);
 
-  // Set manual city and refresh
+  // Set manual city / location and refresh
   const setLocationAndRefresh = async (loc) => {
     setIsUsingCurrentLocation(false);
     localStorage.setItem('cropcare_use_current_location', 'false');
-    setWeatherLocation(loc);
-    if (typeof loc === 'string') {
+    if (typeof loc === 'object' && loc !== null) {
+      localStorage.setItem('cropcare_weather_location', JSON.stringify(loc));
+      setWeatherLocation(loc.name || loc.displayName || 'Custom Location');
+    } else if (typeof loc === 'string') {
       localStorage.setItem('cropcare_weather_location', loc);
+      setWeatherLocation(loc);
     }
     await fetchWeather(loc);
   };

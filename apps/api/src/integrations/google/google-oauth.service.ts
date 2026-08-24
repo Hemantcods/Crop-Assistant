@@ -5,6 +5,7 @@ export type GoogleProfile = {
   googleId: string;
   email: string;
   name: string;
+  profilePic?: string;
 };
 
 export class GoogleOAuthService {
@@ -32,6 +33,7 @@ export class GoogleOAuthService {
       googleId: payload.sub,
       email: payload.email,
       name: payload.name,
+      profilePic: payload.picture,
     };
   }
 }

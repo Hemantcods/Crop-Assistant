@@ -90,6 +90,7 @@ export class AuthService {
         user = await this.authRepository.linkGoogleAccount(
           user.id,
           googleUser.googleId,
+          googleUser.profilePic,
         );
       } else {
         user = await this.authRepository.createUser({
@@ -97,6 +98,7 @@ export class AuthService {
           email: googleUser.email,
           googleId: googleUser.googleId,
           language: "en",
+          profilePic: googleUser.profilePic,
         });
       }
     }
@@ -117,6 +119,7 @@ export class AuthService {
     email: string;
     phone: string | null;
     language: string;
+    profilePic?: string | null;
     createdAt: Date;
     updatedAt: Date;
   }) {
@@ -126,6 +129,7 @@ export class AuthService {
       email: user.email,
       phone: user.phone,
       language: user.language,
+      profilePic: user.profilePic ?? null,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };

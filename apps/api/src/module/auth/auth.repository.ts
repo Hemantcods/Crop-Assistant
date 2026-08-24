@@ -28,6 +28,7 @@ export class AuthRepository {
     passwordHash?: string;
     googleId?: string;
     language: string;
+    profilePic?: string;
   }) {
     return prisma.user.create({
       data: {
@@ -37,16 +38,18 @@ export class AuthRepository {
         passwordHash: input.passwordHash,
         googleId: input.googleId,
         language: input.language,
+        profilePic: input.profilePic,
       },
     });
   }
-  async linkGoogleAccount(userId: string, googleId: string) {
+  async linkGoogleAccount(userId: string, googleId: string, profilePic?: string) {
     return prisma.user.update({
       where: {
         id: userId,
       },
       data: {
         googleId,
+        profilePic,
       },
     });
   }

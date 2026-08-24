@@ -272,13 +272,13 @@ export const FarmDetailPage = () => {
       {/* Farm Weather Telemetry */}
       {farmWeather && (
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Temperature */}
+          {/* Today's Temperature */}
           <div className="bg-surface-container-lowest p-4.5 rounded-2xl border border-outline-variant shadow-xs flex items-center gap-4">
             <div className="p-3 bg-[#fff8e1] rounded-2xl text-[#f57f17] shrink-0">
               <Thermometer className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-xs text-on-surface-variant font-medium">Farm Temperature</p>
+              <p className="text-xs text-on-surface-variant font-medium">Today's Temperature</p>
               <h3 className="text-xl font-bold text-on-surface mt-0.5">
                 {farmWeather.temp}°C
               </h3>
@@ -288,7 +288,7 @@ export const FarmDetailPage = () => {
             </div>
           </div>
 
-          {/* Humidity */}
+          {/* Air Humidity */}
           <div className="bg-surface-container-lowest p-4.5 rounded-2xl border border-outline-variant shadow-xs flex items-center gap-4">
             <div className="p-3 bg-[#e1f5fe] rounded-2xl text-[#0288d1] shrink-0">
               <Droplets className="w-6 h-6" />
@@ -304,18 +304,33 @@ export const FarmDetailPage = () => {
             </div>
           </div>
 
-          {/* Rain Probability */}
-          <div className="bg-surface-container-lowest p-4.5 rounded-2xl border border-outline-variant shadow-xs flex items-center gap-4">
-            <div className="p-3 bg-[#e8f5e9] rounded-2xl text-[#006c48] shrink-0">
+          {/* Tomorrow's Predictive Weather */}
+          <div className={`p-4.5 rounded-2xl border shadow-xs flex items-center gap-4 ${
+            farmWeather.tomorrow?.hasRainAlert || (farmWeather.tomorrow?.rainPercent >= 50)
+              ? 'bg-[#FFF8E1] border-[#FFD54F]'
+              : 'bg-surface-container-lowest border-outline-variant'
+          }`}>
+            <div className={`p-3 rounded-2xl shrink-0 ${
+              farmWeather.tomorrow?.hasRainAlert || (farmWeather.tomorrow?.rainPercent >= 50)
+                ? 'bg-[#FFECB3] text-[#E65100]'
+                : 'bg-[#e8f5e9] text-[#006c48]'
+            }`}>
               <CloudRain className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-xs text-on-surface-variant font-medium">Precipitation</p>
+              <div className="flex items-center gap-1.5">
+                <p className="text-xs text-on-surface-variant font-medium">Tomorrow's Forecast</p>
+                {(farmWeather.tomorrow?.hasRainAlert || (farmWeather.tomorrow?.rainPercent >= 50)) && (
+                  <span className="px-1.5 py-0.2 bg-[#FFECB3] text-[#E65100] rounded text-[9px] font-bold">
+                    Rain Alert
+                  </span>
+                )}
+              </div>
               <h3 className="text-xl font-bold text-on-surface mt-0.5">
-                {farmWeather.forecast?.[0]?.rain || '10%'}
+                {farmWeather.tomorrow?.temp ? farmWeather.tomorrow.temp.split(' / ')[0] : '25°C'}
               </h3>
               <p className="text-[11px] text-on-surface-variant">
-                {farmWeather.wind || '12 km/h Wind'}
+                Rain: {farmWeather.tomorrow?.rain || '20%'} • {farmWeather.tomorrow?.condition || 'Partly cloudy'}
               </p>
             </div>
           </div>

@@ -17,4 +17,6 @@ export type {
   DiagnosisStatus,
   Alert,
   NotificationPreference,
+  AlertType,
+  AlertSeverity,
 } from "./generated/prisma/client.js";
