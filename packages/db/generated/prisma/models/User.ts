@@ -32,6 +32,7 @@ export type UserMinAggregateOutputType = {
   passwordHash: string | null
   googleId: string | null
   language: string | null
+  profilePic: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -44,6 +45,7 @@ export type UserMaxAggregateOutputType = {
   passwordHash: string | null
   googleId: string | null
   language: string | null
+  profilePic: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -56,6 +58,7 @@ export type UserCountAggregateOutputType = {
   passwordHash: number
   googleId: number
   language: number
+  profilePic: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -70,6 +73,7 @@ export type UserMinAggregateInputType = {
   passwordHash?: true
   googleId?: true
   language?: true
+  profilePic?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -82,6 +86,7 @@ export type UserMaxAggregateInputType = {
   passwordHash?: true
   googleId?: true
   language?: true
+  profilePic?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -94,6 +99,7 @@ export type UserCountAggregateInputType = {
   passwordHash?: true
   googleId?: true
   language?: true
+  profilePic?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -179,6 +185,7 @@ export type UserGroupByOutputType = {
   passwordHash: string | null
   googleId: string | null
   language: string
+  profilePic: string | null
   createdAt: Date
   updatedAt: Date
   _count: UserCountAggregateOutputType | null
@@ -212,6 +219,7 @@ export type UserWhereInput = {
   passwordHash?: Prisma.StringNullableFilter<"User"> | string | null
   googleId?: Prisma.StringNullableFilter<"User"> | string | null
   language?: Prisma.StringFilter<"User"> | string
+  profilePic?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   farms?: Prisma.FarmListRelationFilter
@@ -227,6 +235,7 @@ export type UserOrderByWithRelationInput = {
   passwordHash?: Prisma.SortOrderInput | Prisma.SortOrder
   googleId?: Prisma.SortOrderInput | Prisma.SortOrder
   language?: Prisma.SortOrder
+  profilePic?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   farms?: Prisma.FarmOrderByRelationAggregateInput
@@ -245,6 +254,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"User"> | string
   passwordHash?: Prisma.StringNullableFilter<"User"> | string | null
   language?: Prisma.StringFilter<"User"> | string
+  profilePic?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   farms?: Prisma.FarmListRelationFilter
@@ -260,6 +270,7 @@ export type UserOrderByWithAggregationInput = {
   passwordHash?: Prisma.SortOrderInput | Prisma.SortOrder
   googleId?: Prisma.SortOrderInput | Prisma.SortOrder
   language?: Prisma.SortOrder
+  profilePic?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
@@ -278,6 +289,7 @@ export type UserScalarWhereWithAggregatesInput = {
   passwordHash?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   googleId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   language?: Prisma.StringWithAggregatesFilter<"User"> | string
+  profilePic?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
@@ -290,6 +302,7 @@ export type UserCreateInput = {
   passwordHash?: string | null
   googleId?: string | null
   language?: string
+  profilePic?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   farms?: Prisma.FarmCreateNestedManyWithoutUserInput
@@ -305,6 +318,7 @@ export type UserUncheckedCreateInput = {
   passwordHash?: string | null
   googleId?: string | null
   language?: string
+  profilePic?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   farms?: Prisma.FarmUncheckedCreateNestedManyWithoutUserInput
@@ -320,6 +334,7 @@ export type UserUpdateInput = {
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  profilePic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   farms?: Prisma.FarmUpdateManyWithoutUserNestedInput
@@ -335,6 +350,7 @@ export type UserUncheckedUpdateInput = {
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  profilePic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   farms?: Prisma.FarmUncheckedUpdateManyWithoutUserNestedInput
@@ -350,6 +366,7 @@ export type UserCreateManyInput = {
   passwordHash?: string | null
   googleId?: string | null
   language?: string
+  profilePic?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -362,6 +379,7 @@ export type UserUpdateManyMutationInput = {
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  profilePic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -374,6 +392,7 @@ export type UserUncheckedUpdateManyInput = {
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  profilePic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -386,6 +405,7 @@ export type UserCountOrderByAggregateInput = {
   passwordHash?: Prisma.SortOrder
   googleId?: Prisma.SortOrder
   language?: Prisma.SortOrder
+  profilePic?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -398,6 +418,7 @@ export type UserMaxOrderByAggregateInput = {
   passwordHash?: Prisma.SortOrder
   googleId?: Prisma.SortOrder
   language?: Prisma.SortOrder
+  profilePic?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -410,6 +431,7 @@ export type UserMinOrderByAggregateInput = {
   passwordHash?: Prisma.SortOrder
   googleId?: Prisma.SortOrder
   language?: Prisma.SortOrder
+  profilePic?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -481,6 +503,7 @@ export type UserCreateWithoutFarmsInput = {
   passwordHash?: string | null
   googleId?: string | null
   language?: string
+  profilePic?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   alerts?: Prisma.AlertCreateNestedManyWithoutUserInput
@@ -495,6 +518,7 @@ export type UserUncheckedCreateWithoutFarmsInput = {
   passwordHash?: string | null
   googleId?: string | null
   language?: string
+  profilePic?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutUserInput
@@ -525,6 +549,7 @@ export type UserUpdateWithoutFarmsInput = {
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  profilePic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   alerts?: Prisma.AlertUpdateManyWithoutUserNestedInput
@@ -539,6 +564,7 @@ export type UserUncheckedUpdateWithoutFarmsInput = {
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  profilePic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutUserNestedInput
@@ -553,6 +579,7 @@ export type UserCreateWithoutAlertsInput = {
   passwordHash?: string | null
   googleId?: string | null
   language?: string
+  profilePic?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   farms?: Prisma.FarmCreateNestedManyWithoutUserInput
@@ -567,6 +594,7 @@ export type UserUncheckedCreateWithoutAlertsInput = {
   passwordHash?: string | null
   googleId?: string | null
   language?: string
+  profilePic?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   farms?: Prisma.FarmUncheckedCreateNestedManyWithoutUserInput
@@ -597,6 +625,7 @@ export type UserUpdateWithoutAlertsInput = {
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  profilePic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   farms?: Prisma.FarmUpdateManyWithoutUserNestedInput
@@ -611,6 +640,7 @@ export type UserUncheckedUpdateWithoutAlertsInput = {
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  profilePic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   farms?: Prisma.FarmUncheckedUpdateManyWithoutUserNestedInput
@@ -625,6 +655,7 @@ export type UserCreateWithoutNotificationPreferenceInput = {
   passwordHash?: string | null
   googleId?: string | null
   language?: string
+  profilePic?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   farms?: Prisma.FarmCreateNestedManyWithoutUserInput
@@ -639,6 +670,7 @@ export type UserUncheckedCreateWithoutNotificationPreferenceInput = {
   passwordHash?: string | null
   googleId?: string | null
   language?: string
+  profilePic?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   farms?: Prisma.FarmUncheckedCreateNestedManyWithoutUserInput
@@ -669,6 +701,7 @@ export type UserUpdateWithoutNotificationPreferenceInput = {
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  profilePic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   farms?: Prisma.FarmUpdateManyWithoutUserNestedInput
@@ -683,6 +716,7 @@ export type UserUncheckedUpdateWithoutNotificationPreferenceInput = {
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  profilePic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   farms?: Prisma.FarmUncheckedUpdateManyWithoutUserNestedInput
@@ -737,6 +771,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   passwordHash?: boolean
   googleId?: boolean
   language?: boolean
+  profilePic?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   farms?: boolean | Prisma.User$farmsArgs<ExtArgs>
@@ -753,6 +788,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   passwordHash?: boolean
   googleId?: boolean
   language?: boolean
+  profilePic?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -765,6 +801,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   passwordHash?: boolean
   googleId?: boolean
   language?: boolean
+  profilePic?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["user"]>
@@ -777,11 +814,12 @@ export type UserSelectScalar = {
   passwordHash?: boolean
   googleId?: boolean
   language?: boolean
+  profilePic?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "phone" | "email" | "passwordHash" | "googleId" | "language" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "phone" | "email" | "passwordHash" | "googleId" | "language" | "profilePic" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   farms?: boolean | Prisma.User$farmsArgs<ExtArgs>
   alerts?: boolean | Prisma.User$alertsArgs<ExtArgs>
@@ -806,6 +844,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     passwordHash: string | null
     googleId: string | null
     language: string
+    profilePic: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["user"]>
@@ -1241,6 +1280,7 @@ export interface UserFieldRefs {
   readonly passwordHash: Prisma.FieldRef<"User", 'String'>
   readonly googleId: Prisma.FieldRef<"User", 'String'>
   readonly language: Prisma.FieldRef<"User", 'String'>
+  readonly profilePic: Prisma.FieldRef<"User", 'String'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
 }

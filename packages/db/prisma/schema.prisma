@@ -24,6 +24,7 @@ enum SoilRecordSource{
   MANULAL
   SOIL_REPORT
   SENSOR
+  GEOLOCATION
 }
 
 enum DiagnosisStatus {
@@ -55,6 +56,7 @@ model User{
   passwordHash  String?
   googleId  String? @unique 
   language  String @default("en")
+  profilePic String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

@@ -21,7 +21,8 @@ export type CropStatus = (typeof CropStatus)[keyof typeof CropStatus]
 export const SoilRecordSource = {
   MANULAL: 'MANULAL',
   SOIL_REPORT: 'SOIL_REPORT',
-  SENSOR: 'SENSOR'
+  SENSOR: 'SENSOR',
+  GEOLOCATION: 'GEOLOCATION'
 } as const
 
 export type SoilRecordSource = (typeof SoilRecordSource)[keyof typeof SoilRecordSource]
