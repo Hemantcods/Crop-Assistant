@@ -8,35 +8,57 @@ import { Modal } from '../../components/common/Modal';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
 import { Switch } from '../../components/common/Switch';
+import { MapPicker } from '../../components/common/MapPicker';
 import {
-  User,
-  MapPin,
-  Edit2,
   LogOut,
   Globe,
   Gauge,
-  Phone,
-  CheckCircle2,
-  Sparkles,
+  Mail,
+  Plus,
+  Trash2,
+  LandPlot,
 } from 'lucide-react';
+
 
 export const ProfilePage = () => {
   const navigate = useNavigate();
   const { user, updateProfile, logout } = useAuth();
-  const { crops } = useCrops();
+  const { crops, farms, addFarm, deleteFarm } = useCrops();
   const { language, setLanguage, units, setUnits, whatsappSettings, toggleWhatsappSetting, t } =
     useSettings();
   const { addToast } = useToast();
 
   const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
+  const [isAddFarmModalOpen, setIsAddFarmModalOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   // Edit form state
   const [name, setName] = useState(user?.name || 'Sagar');
-  const [phone, setPhone] = useState(user?.phone || '9876543210');
+  const [phone, setPhone] = useState(user?.phone || '');
   const [village, setVillage] = useState(user?.village || 'Shivnagar Village');
   const [district, setDistrict] = useState(user?.district || 'Pune District');
   const [farmSize, setFarmSize] = useState(user?.farmSize || 4.5);
+
+  // Add farm form state
+  const [newFarmName, setNewFarmName] = useState('');
+  const [newFarmArea, setNewFarmArea] = useState('2.5');
+  const [newFarmUnit, setNewFarmUnit] = useState('acre');
+  const [newFarmLat, setNewFarmLat] = useState('18.5204');
+  const [newFarmLng, setNewFarmLng] = useState('73.8567');
+
+  const openEditModal = () => {
+    setName(user?.name || '');
+    setPhone(user?.phone || '');
+    setVillage(user?.village || 'Shivnagar Village');
+    setDistrict(user?.district || 'Pune District');
+    setFarmSize(user?.farmSize || 4.5);
+    setIsEditProfileModalOpen(true);
+  };
+
+  const totalFarmAcreage =
+    farms && farms.length > 0
+      ? farms.reduce((sum, f) => sum + (parseFloat(f.area) || 0), 0)
+      : user?.farmSize || 4.5;
 
   const handleSaveProfile = async (e) => {
     e.preventDefault();
@@ -53,6 +75,40 @@ export const ProfilePage = () => {
       type: 'success',
     });
     setIsEditProfileModalOpen(false);
+  };
+
+  const handleAddFarmSubmit = async (e) => {
+    e.preventDefault();
+    if (!newFarmName) {
+      addToast({ title: 'Farm Name Required', message: 'Please enter a name for the farm.', type: 'error' });
+      return;
+    }
+
+    await addFarm({
+      name: newFarmName,
+      latitude: parseFloat(newFarmLat) || 18.5204,
+      longitude: parseFloat(newFarmLng) || 73.8567,
+      area: parseFloat(newFarmArea) || 1.0,
+      areaUnit: newFarmUnit,
+    });
+
+    addToast({
+      title: 'Farm Registered',
+      message: `${newFarmName} registered to your backend account.`,
+      type: 'success',
+    });
+
+    setIsAddFarmModalOpen(false);
+    setNewFarmName('');
+  };
+
+  const handleDeleteFarm = async (farmId, farmName) => {
+    await deleteFarm(farmId);
+    addToast({
+      title: 'Farm Removed',
+      message: `${farmName || 'Farm'} has been deleted.`,
+      type: 'info',
+    });
   };
 
   const handleLogout = async () => {
@@ -77,7 +133,7 @@ export const ProfilePage = () => {
         </p>
       </header>
 
-      {/* Grid Layout (Span 4 on Left, Span 8 on Right matching Stitch) */}
+      {/* Grid Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Profile Card */}
         <div className="lg:col-span-4 flex flex-col gap-4">
@@ -96,7 +152,7 @@ export const ProfilePage = () => {
               />
               <button
                 type="button"
-                onClick={() => setIsEditProfileModalOpen(true)}
+                onClick={openEditModal}
                 aria-label="Edit Profile Picture"
                 className="absolute bottom-0 right-0 bg-primary text-on-primary p-2 rounded-full shadow-md hover:bg-primary-container hover:text-on-primary-container transition-colors z-20 cursor-pointer active:scale-95"
               >
@@ -108,6 +164,12 @@ export const ProfilePage = () => {
               <h2 className="font-headline-md text-headline-md text-on-surface text-xl font-bold">
                 {user?.fullName || user?.name || 'Sagar Shinde'}
               </h2>
+              {user?.email && (
+                <div className="flex items-center justify-center gap-1 text-on-surface-variant font-label-md text-xs">
+                  <Mail className="w-3.5 h-3.5 text-primary" />
+                  <span>{user.email}</span>
+                </div>
+              )}
               <div className="flex items-center justify-center gap-1 text-on-surface-variant font-label-md text-xs sm:text-sm">
                 <span className="material-symbols-outlined text-[16px] text-primary">
                   location_on
@@ -124,10 +186,10 @@ export const ProfilePage = () => {
             <div className="grid grid-cols-2 gap-3 w-full">
               <div className="flex flex-col items-center bg-surface-container-low p-3.5 rounded-xl border border-outline-variant/50">
                 <span className="font-label-sm text-label-sm text-on-surface-variant text-xs mb-1">
-                  Farm Size
+                  Total Acreage
                 </span>
                 <span className="font-headline-md text-headline-md text-primary font-bold text-lg">
-                  {user?.farmSize || 4.5}{' '}
+                  {totalFarmAcreage}{' '}
                   <span className="font-label-sm text-xs font-normal text-on-surface-variant">
                     {user?.farmUnit || 'Acres'}
                   </span>
@@ -146,18 +208,66 @@ export const ProfilePage = () => {
 
             <button
               type="button"
-              onClick={() => setIsEditProfileModalOpen(true)}
+              onClick={openEditModal}
               className="w-full mt-2 border border-outline text-on-surface-variant py-2.5 rounded-xl font-label-md text-label-md text-sm hover:bg-surface-container hover:text-on-surface transition-colors flex items-center justify-center gap-2 cursor-pointer font-semibold"
             >
               <span className="material-symbols-outlined text-[18px]">manage_accounts</span>
               <span>Edit Profile</span>
             </button>
           </section>
+
+          {/* Registered Farms Section */}
+          <section className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-5 shadow-[0_4px_12px_rgba(45,106,79,0.05)]">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-headline-md text-on-surface text-sm font-bold flex items-center gap-2">
+                <LandPlot className="w-4 h-4 text-primary" />
+                <span>Backend Farms ({farms.length})</span>
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsAddFarmModalOpen(true)}
+                className="text-xs font-bold text-primary hover:underline flex items-center gap-1 cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add Farm</span>
+              </button>
+            </div>
+
+            {farms.length === 0 ? (
+              <p className="text-xs text-on-surface-variant py-3 text-center">
+                No backend farms registered yet. Click &quot;Add Farm&quot; to link your field coordinates.
+              </p>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {farms.map((farm) => (
+                  <div
+                    key={farm.id}
+                    className="flex items-center justify-between p-2.5 bg-surface-container-low rounded-xl text-xs border border-outline-variant/40"
+                  >
+                    <div>
+                      <h4 className="font-bold text-on-surface">{farm.name}</h4>
+                      <p className="text-[11px] text-on-surface-variant">
+                        {farm.area} {farm.areaUnit || 'acre'} • Lat: {Number(farm.latitide || farm.latitude || 18.52).toFixed(2)}, Lng: {Number(farm.longitude || 73.85).toFixed(2)}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteFarm(farm.id, farm.name)}
+                      className="p-1.5 text-on-surface-variant hover:text-error rounded-lg transition-colors cursor-pointer"
+                      title="Delete Farm"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
         </div>
 
         {/* Right Column: Settings & WhatsApp */}
         <div className="lg:col-span-8 flex flex-col gap-5">
-          {/* WhatsApp Card matching Stitch */}
+          {/* WhatsApp Card */}
           <section className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-5 sm:p-6 shadow-[0_4px_12px_rgba(45,106,79,0.05)]">
             <div className="flex items-center gap-3.5 mb-5">
               <div className="bg-[#25D366]/10 p-3 rounded-full flex items-center justify-center shrink-0">
@@ -259,7 +369,7 @@ export const ProfilePage = () => {
             </div>
           </section>
 
-          {/* App Settings Card matching Stitch */}
+          {/* App Settings Card */}
           <section className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-5 sm:p-6 shadow-[0_4px_12px_rgba(45,106,79,0.05)]">
             <h3 className="font-headline-md text-headline-md text-on-surface text-base sm:text-lg font-bold mb-4">
               App Preferences
@@ -288,6 +398,7 @@ export const ProfilePage = () => {
                 >
                   <option value="en">English (UK / India)</option>
                   <option value="hi">हिन्दी (Hindi)</option>
+                  <option value="mr">मराठी (Marathi)</option>
                 </select>
               </div>
 
@@ -344,7 +455,6 @@ export const ProfilePage = () => {
             label="Mobile Phone (+91)"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            required
           />
           <div className="grid grid-cols-2 gap-3">
             <Input
@@ -383,6 +493,82 @@ export const ProfilePage = () => {
         </form>
       </Modal>
 
+      {/* Add Farm Modal (Backend API) */}
+      <Modal
+        isOpen={isAddFarmModalOpen}
+        onClose={() => setIsAddFarmModalOpen(false)}
+        title="Register New Farm Plot"
+        subtitle="Link farm acreage and geographic coordinates to your backend account"
+      >
+        <form onSubmit={handleAddFarmSubmit} className="flex flex-col gap-4 py-2">
+          <Input
+            label="Farm / Plot Name"
+            placeholder="e.g. North River Basin Plot"
+            value={newFarmName}
+            onChange={(e) => setNewFarmName(e.target.value)}
+            required
+          />
+          <div className="grid grid-cols-2 gap-3">
+            <Input
+              label="Acreage"
+              type="number"
+              step="0.1"
+              value={newFarmArea}
+              onChange={(e) => setNewFarmArea(e.target.value)}
+              required
+            />
+            <div className="flex flex-col gap-1.5">
+              <label className="font-label-md text-xs font-semibold text-on-surface">
+                Unit
+              </label>
+              <select
+                value={newFarmUnit}
+                onChange={(e) => setNewFarmUnit(e.target.value)}
+                className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-3 py-2.5 text-xs text-on-surface outline-none"
+              >
+                <option value="acre">Acre</option>
+                <option value="hectare">Hectare</option>
+                <option value="bigha">Bigha</option>
+                <option value="guntha">Guntha</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Interactive Map Picker for Farm Location */}
+          <div className="flex flex-col gap-1.5 pt-1">
+            <label className="font-label-md text-xs font-semibold text-on-surface">
+              Farm Location (Pin on Map or GPS)
+            </label>
+            <MapPicker
+              latitude={parseFloat(newFarmLat) || 18.5204}
+              longitude={parseFloat(newFarmLng) || 73.8567}
+              onChange={({ latitude, longitude, address }) => {
+                setNewFarmLat(String(latitude));
+                setNewFarmLng(String(longitude));
+                if (!newFarmName && address) {
+                  setNewFarmName(address.split(',')[0]);
+                }
+              }}
+            />
+          </div>
+
+
+          <div className="flex gap-3 pt-3 border-t border-outline-variant">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsAddFarmModalOpen(false)}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button type="submit" className="flex-1">
+              Create Farm
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
       {/* Logout Confirmation Modal */}
       <Modal
         isOpen={isLogoutModalOpen}
@@ -393,7 +579,7 @@ export const ProfilePage = () => {
       >
         <div className="flex flex-col gap-4 py-2">
           <p className="text-xs text-on-surface-variant">
-            You can log back in anytime with your phone number or demo credentials.
+            You can log back in anytime with your credentials or Google account.
           </p>
           <div className="flex gap-3 pt-2">
             <Button

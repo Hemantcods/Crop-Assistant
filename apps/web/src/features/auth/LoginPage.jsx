@@ -4,56 +4,48 @@ import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../components/common/Toast';
 import { Modal } from '../../components/common/Modal';
 import { Button } from '../../components/common/Button';
-import { ArrowRight, Sparkles, CheckCircle2, ShieldCheck, Sprout, Info } from 'lucide-react';
+import {
+  ArrowRight,
+  Sparkles,
+  CheckCircle2,
+  ShieldCheck,
+  Sprout,
+  Mail,
+  Lock,
+  User,
+  Phone,
+  Globe,
+} from 'lucide-react';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
-  const { loginWithPhone, loginWithGoogle, loginAsDemo } = useAuth();
+  const { signin, signup, loginWithGoogle, loginAsDemo } = useAuth();
   const { addToast } = useToast();
 
-  const [phone, setPhone] = useState('');
-  const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
-  const [otp, setOtp] = useState(['', '', '', '']);
+  // Mode: 'signin' | 'signup'
+  const [authMode, setAuthMode] = useState('signin');
+
+  // Sign In Form State
+  const [signInEmail, setSignInEmail] = useState('');
+  const [signInPassword, setSignInPassword] = useState('');
+
+  // Sign Up Form State
+  const [signUpName, setSignUpName] = useState('');
+  const [signUpEmail, setSignUpEmail] = useState('');
+  const [signUpPassword, setSignUpPassword] = useState('');
+  const [signUpPhone, setSignUpPhone] = useState('');
+  const [signUpLanguage, setSignUpLanguage] = useState('en');
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLearnMoreOpen, setIsLearnMoreOpen] = useState(false);
 
-  const handlePhoneSubmit = (e) => {
+  // Handle Real Backend Sign In
+  const handleSignInSubmit = async (e) => {
     e.preventDefault();
-    if (!phone || phone.length < 10) {
+    if (!signInEmail || !signInPassword) {
       addToast({
-        title: 'Invalid Number',
-        message: 'Please enter a valid 10-digit mobile number.',
-        type: 'error',
-      });
-      return;
-    }
-    setIsOtpModalOpen(true);
-    addToast({
-      title: 'Demo OTP Sent',
-      message: 'Your verification code is 1234',
-      type: 'info',
-    });
-  };
-
-  const handleOtpChange = (index, value) => {
-    if (value.length > 1) value = value.slice(-1);
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-
-    // Auto-advance
-    if (value && index < 3) {
-      document.getElementById(`otp-input-${index + 1}`)?.focus();
-    }
-  };
-
-  const handleVerifyOtp = async (e) => {
-    e?.preventDefault();
-    const enteredOtp = otp.join('');
-    if (enteredOtp.length < 4) {
-      addToast({
-        title: 'Incomplete Code',
-        message: 'Please enter the full 4-digit OTP.',
+        title: 'Missing Fields',
+        message: 'Please enter both your email and password.',
         type: 'error',
       });
       return;
@@ -61,18 +53,20 @@ export const LoginPage = () => {
 
     setIsSubmitting(true);
     try {
-      await loginWithPhone(phone, enteredOtp);
+      const user = await signin({
+        email: signInEmail,
+        password: signInPassword,
+      });
       addToast({
-        title: 'Welcome to CropCare!',
-        message: 'Login successful.',
+        title: `Welcome back, ${user?.name || 'Farmer'}!`,
+        message: 'Signed in successfully.',
         type: 'success',
       });
-      setIsOtpModalOpen(false);
       navigate('/');
     } catch (err) {
       addToast({
-        title: 'Verification Failed',
-        message: err.message || 'Invalid code, try 1234',
+        title: 'Sign In Failed',
+        message: err.message || 'Invalid email or password.',
         type: 'error',
       });
     } finally {
@@ -80,20 +74,46 @@ export const LoginPage = () => {
     }
   };
 
-  const handleGoogleLogin = async () => {
+  // Handle Real Backend Sign Up
+  const handleSignUpSubmit = async (e) => {
+    e.preventDefault();
+    if (!signUpName || !signUpEmail || !signUpPassword) {
+      addToast({
+        title: 'Missing Fields',
+        message: 'Please fill in all required fields.',
+        type: 'error',
+      });
+      return;
+    }
+
+    if (signUpPassword.length < 8) {
+      addToast({
+        title: 'Weak Password',
+        message: 'Password must be at least 8 characters long.',
+        type: 'error',
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await loginWithGoogle();
+      const user = await signup({
+        name: signUpName,
+        email: signUpEmail,
+        password: signUpPassword,
+        phone: signUpPhone || undefined,
+        language: signUpLanguage,
+      });
       addToast({
-        title: 'Google Sign-In Successful',
-        message: 'Logged in as Sagar.',
+        title: `Welcome to CropCare, ${user?.name || 'Farmer'}!`,
+        message: 'Account created successfully.',
         type: 'success',
       });
       navigate('/');
     } catch (err) {
       addToast({
-        title: 'Error',
-        message: 'Google login failed.',
+        title: 'Registration Failed',
+        message: err.message || 'Could not create account.',
         type: 'error',
       });
     } finally {
@@ -101,10 +121,16 @@ export const LoginPage = () => {
     }
   };
 
+  // Handle Google OAuth
+  const handleGoogleLogin = () => {
+    loginWithGoogle();
+  };
+
+  // Quick Demo Login
   const handleDemoLogin = async () => {
     await loginAsDemo();
     addToast({
-      title: 'Logged in as Sagar',
+      title: 'Logged in as Sagar (Demo)',
       message: 'Demo session active with live sample crops & weather.',
       type: 'success',
     });
@@ -113,21 +139,20 @@ export const LoginPage = () => {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center p-4 sm:p-6 bg-background font-body-md text-on-background">
-      {/* Atmospheric Wheat Background matching Stitch */}
+      {/* Atmospheric Background */}
       <div
         className="absolute inset-0 z-0 bg-cover bg-center"
         style={{
           backgroundImage: `url("https://lh3.googleusercontent.com/aida-public/AB6AXuClMrDlavjVlkpypSt9CNKgq73n1-3IAF6lOJknuJCxjqDQ4ygYmQnNy5Z-cvIycwndkDTEF02zoKg_yLCJoQZuzZN9rGj56UYb9hVWy8UjxrzweLVhwxEYy1Xs63mfXrVS39tqKK_jiiCSD9m6lxK1U68MOqE1vt3bflLItlLaJRKcuaoAKULtxRBo_iCP9HvL-r9HA6AWKMcgxpQ81Kkj5NuBjk2acEBJiuI5wMs4lqy-2HqeXtqckg")`,
         }}
       >
-        {/* Soft overlay matching Digital Organicism aesthetic */}
-        <div className="absolute inset-0 bg-background/75 backdrop-blur-xs" />
+        <div className="absolute inset-0 bg-background/80 backdrop-blur-xs" />
       </div>
 
-      {/* Central Login Card */}
-      <main className="relative z-10 w-full max-w-md bg-surface border border-outline-variant rounded-2xl shadow-[0_12px_32px_rgba(0,0,0,0.08)] p-6 sm:p-8 flex flex-col gap-6">
+      {/* Central Auth Card */}
+      <main className="relative z-10 w-full max-w-md bg-surface border border-outline-variant rounded-2xl shadow-[0_12px_32px_rgba(0,0,0,0.08)] p-6 sm:p-8 flex flex-col gap-5">
         {/* Header Section */}
-        <header className="flex flex-col items-center text-center gap-2">
+        <header className="flex flex-col items-center text-center gap-1.5">
           <div className="flex items-center justify-center gap-2 mb-1">
             <div className="w-10 h-10 rounded-xl bg-primary-container text-[#FFD54F] flex items-center justify-center shadow-xs">
               <Sprout className="w-6 h-6 text-on-primary-container" />
@@ -136,67 +161,241 @@ export const LoginPage = () => {
               CropCare Pro
             </span>
           </div>
-          <h1 className="font-headline-lg-mobile sm:font-headline-lg text-2xl sm:text-3xl text-on-surface font-bold">
-            Welcome to CropCare
+          <h1 className="font-headline-lg-mobile sm:font-headline-lg text-2xl text-on-surface font-bold">
+            {authMode === 'signin'
+              ? 'Sign in to your Farm'
+              : 'Create Farmer Account'}
           </h1>
-          <p className="font-body-md text-body-md text-on-surface-variant text-sm">
-            Your digital farming steward & AI agricultural assistant
+          <p className="font-body-md text-body-md text-on-surface-variant text-xs sm:text-sm">
+            AI-Powered Precision Agriculture & Farm Assistant
           </p>
         </header>
 
-        {/* Login Form */}
-        <form onSubmit={handlePhoneSubmit} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <label
-              className="font-label-md text-label-md text-on-surface text-sm font-semibold"
-              htmlFor="phone-number"
-            >
-              Phone Number
-            </label>
-            <div className="relative">
-              <div className="absolute left-0 inset-y-0 flex items-center pl-4 pr-3 border-r border-outline-variant my-2 pointer-events-none">
-                <span className="font-body-md text-body-md text-on-surface-variant text-sm font-medium">
-                  +91
-                </span>
-              </div>
-              <input
-                className="w-full bg-surface-container-lowest border border-outline-variant rounded-xl pl-[72px] pr-4 py-3.5 font-body-md text-body-md text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-xs text-sm"
-                id="phone-number"
-                pattern="[0-9]{10}"
-                maxLength={10}
-                placeholder="Enter 10-digit number"
-                required
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-              />
-            </div>
-          </div>
-
+        {/* Tab Navigation */}
+        <div className="grid grid-cols-2 gap-1.5 p-1 bg-surface-container-low rounded-xl border border-outline-variant">
           <button
-            type="submit"
-            className="w-full h-[56px] mt-1 bg-primary text-on-primary font-label-md text-label-md rounded-xl hover:bg-primary-container hover:text-on-primary-container active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+            type="button"
+            onClick={() => setAuthMode('signin')}
+            className={`py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+              authMode === 'signin'
+                ? 'bg-surface text-primary shadow-xs'
+                : 'text-on-surface-variant hover:text-on-surface'
+            }`}
           >
-            <span>Get OTP</span>
-            <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+            Sign In
           </button>
+          <button
+            type="button"
+            onClick={() => setAuthMode('signup')}
+            className={`py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+              authMode === 'signup'
+                ? 'bg-surface text-primary shadow-xs'
+                : 'text-on-surface-variant hover:text-on-surface'
+            }`}
+          >
+            Create Account
+          </button>
+        </div>
 
-          <div className="flex items-center gap-3 my-1">
-            <div className="h-px bg-outline-variant flex-1" />
-            <span className="text-label-sm text-on-surface-variant text-xs uppercase tracking-wider">
-              or
-            </span>
-            <div className="h-px bg-outline-variant flex-1" />
-          </div>
+        {/* TAB 1: SIGN IN FORM */}
+        {authMode === 'signin' && (
+          <form onSubmit={handleSignInSubmit} className="flex flex-col gap-3.5">
+            <div className="flex flex-col gap-1.5">
+              <label
+                className="font-label-md text-label-md text-on-surface text-xs font-semibold"
+                htmlFor="signin-email"
+              >
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="w-4 h-4 text-on-surface-variant absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  id="signin-email"
+                  type="email"
+                  required
+                  placeholder="farmer@cropcare.ag"
+                  value={signInEmail}
+                  onChange={(e) => setSignInEmail(e.target.value)}
+                  className="w-full bg-surface-container-lowest border border-outline-variant rounded-xl pl-10 pr-4 py-3 font-body-md text-on-surface text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                />
+              </div>
+            </div>
 
+            <div className="flex flex-col gap-1.5">
+              <label
+                className="font-label-md text-label-md text-on-surface text-xs font-semibold"
+                htmlFor="signin-password"
+              >
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-on-surface-variant absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  id="signin-password"
+                  type="password"
+                  required
+                  placeholder="••••••••"
+                  value={signInPassword}
+                  onChange={(e) => setSignInPassword(e.target.value)}
+                  className="w-full bg-surface-container-lowest border border-outline-variant rounded-xl pl-10 pr-4 py-3 font-body-md text-on-surface text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                />
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              size="lg"
+              isLoading={isSubmitting}
+              className="w-full mt-1"
+            >
+              <span>Sign In</span>
+              <ArrowRight className="w-4 h-4 ml-1" />
+            </Button>
+          </form>
+        )}
+
+        {/* TAB 2: SIGN UP FORM */}
+        {authMode === 'signup' && (
+          <form onSubmit={handleSignUpSubmit} className="flex flex-col gap-3">
+            <div className="flex flex-col gap-1">
+              <label
+                className="font-label-md text-label-md text-on-surface text-xs font-semibold"
+                htmlFor="signup-name"
+              >
+                Full Name
+              </label>
+              <div className="relative">
+                <User className="w-4 h-4 text-on-surface-variant absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  id="signup-name"
+                  type="text"
+                  required
+                  placeholder="e.g. Sagar Shinde"
+                  value={signUpName}
+                  onChange={(e) => setSignUpName(e.target.value)}
+                  className="w-full bg-surface-container-lowest border border-outline-variant rounded-xl pl-10 pr-4 py-2.5 font-body-md text-on-surface text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label
+                className="font-label-md text-label-md text-on-surface text-xs font-semibold"
+                htmlFor="signup-email"
+              >
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="w-4 h-4 text-on-surface-variant absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  id="signup-email"
+                  type="email"
+                  required
+                  placeholder="farmer@cropcare.ag"
+                  value={signUpEmail}
+                  onChange={(e) => setSignUpEmail(e.target.value)}
+                  className="w-full bg-surface-container-lowest border border-outline-variant rounded-xl pl-10 pr-4 py-2.5 font-body-md text-on-surface text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2.5">
+              <div className="flex flex-col gap-1">
+                <label
+                  className="font-label-md text-label-md text-on-surface text-xs font-semibold"
+                  htmlFor="signup-phone"
+                >
+                  Phone (Optional)
+                </label>
+                <div className="relative">
+                  <Phone className="w-3.5 h-3.5 text-on-surface-variant absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    id="signup-phone"
+                    type="tel"
+                    placeholder="9876543210"
+                    maxLength={15}
+                    value={signUpPhone}
+                    onChange={(e) => setSignUpPhone(e.target.value)}
+                    className="w-full bg-surface-container-lowest border border-outline-variant rounded-xl pl-8 pr-3 py-2.5 font-body-md text-on-surface text-xs focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label
+                  className="font-label-md text-label-md text-on-surface text-xs font-semibold"
+                  htmlFor="signup-lang"
+                >
+                  Language
+                </label>
+                <div className="relative">
+                  <Globe className="w-3.5 h-3.5 text-on-surface-variant absolute left-3 top-1/2 -translate-y-1/2" />
+                  <select
+                    id="signup-lang"
+                    value={signUpLanguage}
+                    onChange={(e) => setSignUpLanguage(e.target.value)}
+                    className="w-full bg-surface-container-lowest border border-outline-variant rounded-xl pl-8 pr-2 py-2.5 font-body-md text-on-surface text-xs focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all cursor-pointer"
+                  >
+                    <option value="en">English</option>
+                    <option value="hi">हिन्दी (Hindi)</option>
+                    <option value="mr">मराठी (Marathi)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label
+                className="font-label-md text-label-md text-on-surface text-xs font-semibold"
+                htmlFor="signup-password"
+              >
+                Password (min 8 chars)
+              </label>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-on-surface-variant absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  id="signup-password"
+                  type="password"
+                  required
+                  placeholder="At least 8 characters"
+                  value={signUpPassword}
+                  onChange={(e) => setSignUpPassword(e.target.value)}
+                  className="w-full bg-surface-container-lowest border border-outline-variant rounded-xl pl-10 pr-4 py-2.5 font-body-md text-on-surface text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                />
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              size="lg"
+              isLoading={isSubmitting}
+              className="w-full mt-1"
+            >
+              <span>Create Account</span>
+              <ArrowRight className="w-4 h-4 ml-1" />
+            </Button>
+          </form>
+        )}
+
+        {/* Divider */}
+        <div className="flex items-center gap-3 my-0.5">
+          <div className="h-px bg-outline-variant flex-1" />
+          <span className="text-label-sm text-on-surface-variant text-[11px] uppercase tracking-wider">
+            or continue with
+          </span>
+          <div className="h-px bg-outline-variant flex-1" />
+        </div>
+
+        {/* Third-Party & Demo Auth */}
+        <div className="flex flex-col gap-2.5">
           {/* Google Sign In */}
           <button
             type="button"
             onClick={handleGoogleLogin}
             disabled={isSubmitting}
-            className="w-full h-[54px] bg-surface-container-lowest border border-outline-variant text-on-surface font-label-md text-label-md text-sm rounded-xl hover:bg-surface-container-low active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-xs cursor-pointer"
+            className="w-full h-[48px] bg-surface-container-lowest border border-outline-variant text-on-surface font-label-md text-xs sm:text-sm font-semibold rounded-xl hover:bg-surface-container-low active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-xs cursor-pointer"
           >
-            <svg className="w-5 h-5" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                 fill="#4285F4"
@@ -221,74 +420,27 @@ export const LoginPage = () => {
           <button
             type="button"
             onClick={handleDemoLogin}
-            className="w-full py-3 bg-secondary-container text-on-secondary-container rounded-xl font-label-md text-label-md text-sm hover:bg-surface-container-high active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer font-semibold"
+            className="w-full py-2.5 bg-secondary-container text-on-secondary-container rounded-xl font-label-md text-xs sm:text-sm hover:bg-surface-container-high active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer font-bold"
           >
             <Sparkles className="w-4 h-4 text-[#00734D]" />
-            <span>Try Demo as Sagar (Farmer)</span>
+            <span>Instant Demo (Preview Mode)</span>
           </button>
-        </form>
+        </div>
 
         {/* Footer Link */}
-        <footer className="text-center border-t border-outline-variant pt-4">
+        <footer className="text-center border-t border-outline-variant pt-3.5">
           <button
             type="button"
             onClick={() => setIsLearnMoreOpen(true)}
-            className="font-label-md text-label-md text-sm text-primary hover:text-secondary transition-colors inline-flex items-center gap-1.5 group cursor-pointer"
+            className="font-label-md text-xs text-primary hover:text-secondary transition-colors inline-flex items-center gap-1.5 group cursor-pointer"
           >
-            <span>Learn more about CropCare</span>
-            <span className="material-symbols-outlined text-[16px] group-hover:translate-x-0.5 transition-transform">
+            <span>About CropCare Agricultural AI</span>
+            <span className="material-symbols-outlined text-[14px] group-hover:translate-x-0.5 transition-transform">
               open_in_new
             </span>
           </button>
         </footer>
       </main>
-
-      {/* OTP Verification Modal */}
-      <Modal
-        isOpen={isOtpModalOpen}
-        onClose={() => setIsOtpModalOpen(false)}
-        title="Enter Verification Code"
-        subtitle={`We sent a 4-digit code to +91 ${phone}`}
-        maxWidth="max-w-sm"
-      >
-        <form onSubmit={handleVerifyOtp} className="flex flex-col gap-5 py-2">
-          <div className="flex justify-center gap-3 my-2">
-            {[0, 1, 2, 3].map((index) => (
-              <input
-                key={index}
-                id={`otp-input-${index}`}
-                type="text"
-                maxLength={1}
-                value={otp[index]}
-                onChange={(e) => handleOtpChange(index, e.target.value)}
-                className="w-14 h-14 text-center text-2xl font-bold text-primary bg-surface-container-low border-2 border-outline-variant rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
-              />
-            ))}
-          </div>
-
-          <div className="p-3 bg-secondary-container/50 rounded-xl flex items-center gap-2 text-xs text-on-secondary-container">
-            <Info className="w-4 h-4 shrink-0" />
-            <span>Demo code is preset to <strong>1234</strong></span>
-          </div>
-
-          <Button type="submit" size="lg" isLoading={isSubmitting} className="w-full">
-            Verify & Continue
-          </Button>
-
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={() => {
-                setOtp(['1', '2', '3', '4']);
-                addToast({ title: 'Code Filled', message: 'Demo code 1234 filled', type: 'info' });
-              }}
-              className="text-xs text-primary hover:underline font-semibold"
-            >
-              Fill Demo Code (1234)
-            </button>
-          </div>
-        </form>
-      </Modal>
 
       {/* Learn More Modal */}
       <Modal

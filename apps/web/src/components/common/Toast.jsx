@@ -1,13 +1,19 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
 import { CheckCircle2, AlertTriangle, AlertCircle, Info, X } from 'lucide-react';
 
 const ToastContext = createContext();
 
 export const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
+  const toastIdRef = useRef(0);
 
-  const addToast = ({ title, message, type = 'success', duration = 4000 }) => {
-    const id = Date.now() + Math.random();
+  const removeToast = useCallback((id) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
+
+  const addToast = useCallback(({ title, message, type = 'success', duration = 4000 }) => {
+    toastIdRef.current += 1;
+    const id = toastIdRef.current;
     setToasts((prev) => [...prev, { id, title, message, type }]);
 
     if (duration > 0) {
@@ -15,11 +21,8 @@ export const ToastProvider = ({ children }) => {
         removeToast(id);
       }, duration);
     }
-  };
+  }, [removeToast]);
 
-  const removeToast = (id) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-  };
 
   return (
     <ToastContext.Provider value={{ addToast }}>

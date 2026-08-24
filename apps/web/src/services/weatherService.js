@@ -278,14 +278,13 @@ export const weatherService = {
 
     let cacheKey;
     let isCoords = false;
-    let coordsObj = null;
 
     if (typeof query === 'object' && query !== null && query.lat && query.lon) {
       isCoords = true;
-      coordsObj = query;
       params.lat = query.lat;
       params.lon = query.lon;
       cacheKey = `${WEATHER_CACHE_KEY_PREFIX}${query.lat.toFixed(2)}_${query.lon.toFixed(2)}`;
+
     } else {
       const cityQuery = typeof query === 'string' && query.trim() ? query.trim() : 'Pune,IN';
       params.q = cityQuery;

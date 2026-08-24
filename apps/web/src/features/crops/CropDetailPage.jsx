@@ -64,10 +64,8 @@ export const CropDetailPage = () => {
     setActivityNotes('');
   };
 
-  // SVG Chart data points generator
-  const trendData = timeRange === '30' ? currentCrop.healthTrend30d : currentCrop.healthTrend7d;
-
   return (
+
     <div className="flex flex-col gap-6 sm:gap-8">
       {/* Header Section */}
       <section className="flex flex-col md:flex-row md:items-end justify-between gap-4">

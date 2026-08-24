@@ -2,14 +2,13 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useAlerts } from '../../context/AlertsContext';
-import { useSettings } from '../../context/SettingsContext';
 
 export const MobileTopBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
   const { unreadCount, setIsWeatherModalOpen } = useAlerts();
-  const { t } = useSettings();
+
 
   const isDetailPage =
     location.pathname.startsWith('/crops/') ||

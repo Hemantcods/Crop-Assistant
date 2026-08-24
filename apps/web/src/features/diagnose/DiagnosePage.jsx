@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useDiagnosis } from '../../context/DiagnosisContext';
 import { useToast } from '../../components/common/Toast';
 import { MOCK_SAMPLE_DIAGNOSES } from '../../data/mockData';
@@ -14,12 +14,18 @@ import {
   Scan,
   BrainCircuit,
   Info,
+  MapPin,
+  Sprout,
 } from 'lucide-react';
 
 export const DiagnosePage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { startScan, isAnalyzing, analyzingStep } = useDiagnosis();
   const { addToast } = useToast();
+
+  const activeFarmName = location.state?.farmName;
+  const activeCropName = location.state?.cropName;
 
   const fileInputRef = useRef(null);
   const [selectedPreset, setSelectedPreset] = useState(null);
@@ -53,7 +59,7 @@ export const DiagnosePage = () => {
     } catch (err) {
       addToast({
         title: 'Scan Failed',
-        message: 'Could not process leaf image.',
+        message: err.message || 'Could not process leaf image.',
         type: 'error',
       });
     }
@@ -63,6 +69,24 @@ export const DiagnosePage = () => {
     <div className="flex flex-col gap-6 sm:gap-8">
       {/* Page Header */}
       <div className="text-center lg:text-left">
+        {/* Context badge if navigated from a farm */}
+        {(activeFarmName || activeCropName) && (
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-xs font-semibold mb-3">
+            {activeFarmName && (
+              <span className="flex items-center gap-1">
+                <MapPin className="w-3 h-3 text-primary" />
+                <span>Farm: {activeFarmName}</span>
+              </span>
+            )}
+            {activeCropName && (
+              <span className="flex items-center gap-1 border-l border-on-secondary-container/20 pl-2">
+                <Sprout className="w-3 h-3 text-primary" />
+                <span>Crop: {activeCropName}</span>
+              </span>
+            )}
+          </div>
+        )}
+
         <h1 className="font-headline-lg-mobile lg:font-headline-lg text-2xl sm:text-3xl lg:text-4xl text-primary font-bold mb-2">
           Check your crop
         </h1>

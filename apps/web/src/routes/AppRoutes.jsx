@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { AppLayout } from '../components/layout/AppLayout';
 import { LoginPage } from '../features/auth/LoginPage';
 import { DashboardPage } from '../features/dashboard/DashboardPage';
+import { FarmDetailPage } from '../features/farms/FarmDetailPage';
 import { CropsListPage } from '../features/crops/CropsListPage';
 import { CropDetailPage } from '../features/crops/CropDetailPage';
 import { DiagnosePage } from '../features/diagnose/DiagnosePage';
@@ -19,8 +20,11 @@ export const AppRoutes = () => {
       {/* Main App Layout */}
       <Route path="/" element={<AppLayout />}>
         <Route index element={<DashboardPage />} />
+        <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="farms/:farmId" element={<FarmDetailPage />} />
+        <Route path="farm/:farmId" element={<FarmDetailPage />} />
         <Route path="crops" element={<CropsListPage />} />
-        <Route path="crops/:aq`wcropId" element={<CropDetailPage />} />
+        <Route path="crops/:cropId" element={<CropDetailPage />} />
         <Route path="diagnose" element={<DiagnosePage />} />
         <Route path="diagnose/result" element={<DiagnosisResultPage />} />
         <Route path="diagnose/:id" element={<DiagnosisResultPage />} />
@@ -34,3 +38,4 @@ export const AppRoutes = () => {
     </Routes>
   );
 };
+

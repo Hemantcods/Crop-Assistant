@@ -9,21 +9,21 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Initialize auth state by verifying session with backend /auth/me
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const token = localStorage.getItem('cropcare_auth_token');
-        if (token) {
-          const currentUser = await authService.getCurrentUser();
+        const currentUser = await authService.getCurrentUser();
+        if (currentUser) {
           setUser(currentUser);
           setIsAuthenticated(true);
         } else {
-          // Default authenticated as Sagar for instant seamless experience
+          // If no active session, default to demo farmer for frictionless UX
           setUser(MOCK_USER);
           setIsAuthenticated(true);
         }
       } catch (err) {
-        console.error('Auth initialization error:', err);
+        console.warn('Auth initialization fallback:', err.message);
         setUser(MOCK_USER);
         setIsAuthenticated(true);
       } finally {
@@ -33,6 +33,38 @@ export const AuthProvider = ({ children }) => {
     initAuth();
   }, []);
 
+  // Real backend Sign In
+  const signin = async (credentials) => {
+    setIsLoading(true);
+    try {
+      const loggedInUser = await authService.signin(credentials);
+      setUser(loggedInUser);
+      setIsAuthenticated(true);
+      return loggedInUser;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Real backend Sign Up
+  const signup = async (userData) => {
+    setIsLoading(true);
+    try {
+      const registeredUser = await authService.signup(userData);
+      setUser(registeredUser);
+      setIsAuthenticated(true);
+      return registeredUser;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Google OAuth Login
+  const loginWithGoogle = () => {
+    authService.loginWithGoogle();
+  };
+
+  // Mobile OTP Login
   const loginWithPhone = async (phone, otp) => {
     setIsLoading(true);
     try {
@@ -45,36 +77,26 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const loginWithGoogle = async () => {
-    setIsLoading(true);
-    try {
-      const res = await authService.loginWithGoogle();
-      setUser(res.user);
-      setIsAuthenticated(true);
-      return res;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  // Instant Demo Farmer Login
   const loginAsDemo = async () => {
     setIsLoading(true);
     try {
       setUser(MOCK_USER);
       setIsAuthenticated(true);
-      localStorage.setItem('cropcare_auth_token', 'mock-jwt-token-farmer-01');
       localStorage.setItem('cropcare_user', JSON.stringify(MOCK_USER));
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Profile update
   const updateProfile = async (updates) => {
     const updated = await authService.updateProfile(updates);
     setUser(updated);
     return updated;
   };
 
+  // Logout
   const logout = async () => {
     await authService.logout();
     setUser(null);
@@ -87,6 +109,8 @@ export const AuthProvider = ({ children }) => {
         user,
         isAuthenticated,
         isLoading,
+        signin,
+        signup,
         loginWithPhone,
         loginWithGoogle,
         loginAsDemo,
@@ -106,3 +130,4 @@ export const useAuth = () => {
   }
   return context;
 };
+

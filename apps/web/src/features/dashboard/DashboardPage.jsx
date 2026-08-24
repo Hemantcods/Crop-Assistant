@@ -3,11 +3,11 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCrops } from '../../context/CropContext';
 import { useAlerts } from '../../context/AlertsContext';
-import { useSettings } from '../../context/SettingsContext';
 import { useToast } from '../../components/common/Toast';
+
+import { AddFarmModal } from '../../components/common/AddFarmModal';
 import { Modal } from '../../components/common/Modal';
 import { Button } from '../../components/common/Button';
-import { Input } from '../../components/common/Input';
 import { Badge } from '../../components/common/Badge';
 import {
   Search,
@@ -17,57 +17,28 @@ import {
   CheckCircle2,
   AlertTriangle,
   ArrowRight,
-  TrendingUp,
   MapPin,
   Calendar,
   Sparkles,
+  Sprout,
+  Scan,
+  Compass,
+  Layers,
 } from 'lucide-react';
-import confetti from 'canvas-confetti';
 
 export const DashboardPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { crops, addCrop } = useCrops();
+  const { farms, crops, getCropsByFarmId, isLoading } = useCrops();
   const { weather, setIsWeatherModalOpen } = useAlerts();
-  const { t } = useSettings();
   const { addToast } = useToast();
 
   // Modals state
-  const [isAddCropModalOpen, setIsAddCropModalOpen] = useState(false);
+  const [isAddFarmModalOpen, setIsAddFarmModalOpen] = useState(false);
   const [isSoilModalOpen, setIsSoilModalOpen] = useState(false);
   const [isStormAlertModalOpen, setIsStormAlertModalOpen] = useState(false);
   const [isAnalyzingSoil, setIsAnalyzingSoil] = useState(false);
   const [soilResult, setSoilResult] = useState(null);
-
-  // New crop form state
-  const [newCropName, setNewCropName] = useState('');
-  const [newCropVariety, setNewCropVariety] = useState('');
-  const [newCropField, setNewCropField] = useState('');
-  const [newCropAcres, setNewCropAcres] = useState('3.0');
-
-  const handleAddCropSubmit = async (e) => {
-    e.preventDefault();
-    if (!newCropName) {
-      addToast({ title: 'Crop Name Required', message: 'Please enter crop name.', type: 'error' });
-      return;
-    }
-    const created = await addCrop({
-      name: newCropName,
-      variety: newCropVariety || 'High Yield Hybrid',
-      field: newCropField || 'South Plot',
-      acres: newCropAcres,
-    });
-    confetti({ particleCount: 50, spread: 60 });
-    addToast({
-      title: 'Crop Registered!',
-      message: `${created.name} successfully added to your farm portfolio.`,
-      type: 'success',
-    });
-    setIsAddCropModalOpen(false);
-    setNewCropName('');
-    setNewCropVariety('');
-    setNewCropField('');
-  };
 
   const handleSoilUploadSim = () => {
     setIsAnalyzingSoil(true);
@@ -129,6 +100,14 @@ export const DashboardPage = () => {
             </button>
           </div>
         </div>
+
+        <Button
+          onClick={() => setIsAddFarmModalOpen(true)}
+          icon={<PlusCircle className="w-4 h-4" />}
+          className="w-full sm:w-auto"
+        >
+          Add New Farm
+        </Button>
       </section>
 
       {/* Attention Section (Alert Banner matching Stitch) */}
@@ -150,7 +129,7 @@ export const DashboardPage = () => {
                 Heavy rain expected tomorrow
               </h3>
               <p className="font-body-md text-body-md text-[#F57C00] text-sm mt-0.5">
-                Your wheat field may need attention. 35-50mm rainfall forecast with gusty winds.
+                35-50mm rainfall forecast with gusty winds. Ensure field furrow drainage is unobstructed.
               </p>
             </div>
           </div>
@@ -164,13 +143,13 @@ export const DashboardPage = () => {
         </div>
       </section>
 
-      {/* Quick Actions (Matching Stitch Layout) */}
+      {/* Quick Actions */}
       <section>
         <h2 className="font-headline-md text-headline-md text-on-background text-lg sm:text-xl font-bold mb-3.5">
           Quick Actions
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-4">
-          {/* Dominant Primary CTA */}
+          {/* Dominant Primary CTA: AI Crop Scan */}
           <button
             onClick={() => navigate('/diagnose')}
             className="col-span-2 md:col-span-1 bg-primary text-on-primary rounded-2xl p-4 flex items-center justify-center gap-3 shadow-[0_4px_12px_rgba(15,82,56,0.2)] hover:bg-on-primary-fixed-variant transition-all active:scale-[0.98] min-h-[56px] cursor-pointer group"
@@ -183,16 +162,16 @@ export const DashboardPage = () => {
             </span>
           </button>
 
-          {/* Secondary CTA: Add Crops */}
+          {/* Secondary CTA: Add Farm */}
           <button
-            onClick={() => setIsAddCropModalOpen(true)}
+            onClick={() => setIsAddFarmModalOpen(true)}
             className="bg-surface text-on-surface-variant border border-outline-variant rounded-2xl p-4 flex flex-col items-center justify-center gap-2 hover:bg-surface-container-low transition-all active:scale-[0.98] shadow-[0_4px_12px_rgba(45,106,79,0.05)] min-h-[56px] cursor-pointer"
           >
             <span className="material-symbols-outlined text-outline text-[24px]">
-              add_circle
+              add_location_alt
             </span>
             <span className="font-label-md text-label-md text-xs sm:text-sm font-semibold text-on-surface">
-              Add Crops
+              Add Farm Plot
             </span>
           </button>
 
@@ -211,160 +190,182 @@ export const DashboardPage = () => {
         </div>
       </section>
 
-      {/* Crop Overview (Bento Grid Style matching Stitch) */}
+      {/* Farms Portfolio Overview Section */}
       <section className="mb-4">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="font-headline-md text-headline-md text-on-background text-lg sm:text-xl font-bold">
-            Crop Overview
-          </h2>
-          <Link
-            to="/crops"
-            className="text-primary font-label-md text-label-md text-sm font-semibold hover:underline flex items-center gap-1"
-          >
-            <span>View all ({crops.length})</span>
-            <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
-          </Link>
+          <div className="flex items-center gap-2.5">
+            <h2 className="font-headline-md text-headline-md text-on-background text-lg sm:text-xl font-bold">
+              My Farm Plots
+            </h2>
+            {farms.length > 0 && (
+              <span className="px-2.5 py-0.5 bg-secondary-container text-on-secondary-container rounded-full text-xs font-bold">
+                {farms.length} {farms.length === 1 ? 'Farm' : 'Farms'}
+              </span>
+            )}
+          </div>
+
+          {farms.length > 0 && (
+            <Button
+              variant="outlinePrimary"
+              onClick={() => setIsAddFarmModalOpen(true)}
+              icon={<PlusCircle className="w-3.5 h-3.5" />}
+              className="text-xs py-1.5 px-3"
+            >
+              Add Farm
+            </Button>
+          )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-          {crops.map((crop) => (
-            <div
-              key={crop.id}
-              className="bg-surface border border-outline-variant rounded-2xl overflow-hidden shadow-[0_4px_12px_rgba(45,106,79,0.05)] flex flex-col hover:shadow-[0_8px_24px_rgba(45,106,79,0.1)] transition-all duration-300"
-            >
-              {/* Card Banner Image */}
-              <div className="h-44 w-full relative overflow-hidden">
-                <div className="absolute inset-0 bg-black/25 z-10" />
-                <img
-                  src={crop.imageUrl}
-                  alt={crop.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute top-4 left-4 z-20">
-                  <Badge
-                    variant={crop.status === 'Healthy' ? 'success' : 'warning'}
-                    icon={
-                      <span
-                        className="material-symbols-outlined text-[14px] fill"
-                      >
-                        {crop.status === 'Healthy' ? 'check_circle' : 'warning'}
-                      </span>
-                    }
-                  >
-                    {crop.status}
-                  </Badge>
-                </div>
-                <div className="absolute bottom-3 right-4 z-20 bg-inverse-surface/75 backdrop-blur-xs text-inverse-on-surface px-2.5 py-1 rounded-lg text-xs font-semibold">
-                  {crop.acres} Acres
-                </div>
+        {/* Empty State when no farms exist from backend */}
+        {farms.length === 0 ? (
+          <div className="bg-surface border-2 border-dashed border-outline-variant rounded-3xl p-8 sm:p-12 text-center flex flex-col items-center justify-center gap-5 shadow-xs">
+            <div className="w-20 h-20 rounded-full bg-primary-container text-primary flex items-center justify-center shadow-inner">
+              <span className="material-symbols-outlined text-[40px]">agriculture</span>
+            </div>
+
+            <div className="max-w-md">
+              <h3 className="text-xl font-bold text-on-surface mb-2 font-headline-md">
+                No Farms Registered Yet
+              </h3>
+              <p className="text-sm text-on-surface-variant leading-relaxed">
+                Add your first farm plot using our interactive map coordinates picker to start monitoring crops, tracking microclimate weather, and running AI disease scans.
+              </p>
+            </div>
+
+            {/* Feature Pills */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-lg my-2">
+              <div className="p-3 bg-surface-container-low rounded-xl border border-outline-variant/60 text-center flex flex-col items-center gap-1">
+                <MapPin className="w-5 h-5 text-primary" />
+                <span className="text-xs font-bold text-on-surface">Map Pinpoint</span>
+                <span className="text-[10px] text-on-surface-variant">GPS boundaries</span>
               </div>
-
-              {/* Card Body */}
-              <div className="p-5 flex flex-col flex-grow">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <h3 className="font-headline-md text-headline-md text-on-surface text-lg font-bold">
-                      {crop.name}
-                    </h3>
-                    <p className="font-body-md text-body-md text-on-surface-variant text-xs sm:text-sm">
-                      {crop.field}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <span
-                      className={`font-headline-md text-headline-md text-lg font-bold ${
-                        crop.status === 'Healthy' ? 'text-primary' : 'text-[#E65100]'
-                      }`}
-                    >
-                      {crop.growthPercent}%
-                    </span>
-                    <p className="font-label-sm text-label-sm text-on-surface-variant text-xs">
-                      Growth
-                    </p>
-                  </div>
-                </div>
-
-                {/* Progress Bar */}
-                <div className="w-full bg-surface-container-high rounded-full h-2.5 mt-2 mb-5 overflow-hidden">
-                  <div
-                    className={`h-2.5 rounded-full progress-bar-fill ${
-                      crop.status === 'Healthy' ? 'bg-primary' : 'bg-[#FFB300]'
-                    }`}
-                    style={{ '--progress-width': `${crop.growthPercent}%` }}
-                  />
-                </div>
-
-                <div className="mt-auto pt-2">
-                  <Button
-                    onClick={() => navigate(`/crops/${crop.id}`)}
-                    variant={crop.status === 'Healthy' ? 'outlinePrimary' : 'warning'}
-                    className="w-full text-sm font-semibold"
-                  >
-                    <span>View crops</span>
-                    <ArrowRight className="w-4 h-4 ml-1" />
-                  </Button>
-                </div>
+              <div className="p-3 bg-surface-container-low rounded-xl border border-outline-variant/60 text-center flex flex-col items-center gap-1">
+                <CloudLightning className="w-5 h-5 text-[#F57C00]" />
+                <span className="text-xs font-bold text-on-surface">Live Weather</span>
+                <span className="text-[10px] text-on-surface-variant">Plot forecast</span>
+              </div>
+              <div className="p-3 bg-surface-container-low rounded-xl border border-outline-variant/60 text-center flex flex-col items-center gap-1">
+                <Scan className="w-5 h-5 text-[#2E7D32]" />
+                <span className="text-xs font-bold text-on-surface">AI Crop Scan</span>
+                <span className="text-[10px] text-on-surface-variant">Instant diagnosis</span>
               </div>
             </div>
-          ))}
-        </div>
+
+            <Button
+              onClick={() => setIsAddFarmModalOpen(true)}
+              className="py-3.5 px-8 text-sm font-bold shadow-md active:scale-95"
+              icon={<PlusCircle className="w-5 h-5" />}
+            >
+              Add Your First Farm
+            </Button>
+          </div>
+        ) : (
+          /* Farms Grid */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {farms.map((farm) => {
+              const farmCrops = getCropsByFarmId(farm.id);
+              const avgHealth =
+                farmCrops.length > 0
+                  ? Math.round(
+                      farmCrops.reduce((acc, c) => acc + (c.healthPercent || 85), 0) /
+                        farmCrops.length
+                    )
+                  : 90;
+
+              return (
+                <div
+                  key={farm.id}
+                  onClick={() => navigate(`/farms/${farm.id}`)}
+                  className="bg-surface border border-outline-variant rounded-2xl overflow-hidden shadow-[0_4px_12px_rgba(45,106,79,0.05)] hover:shadow-[0_8px_24px_rgba(45,106,79,0.12)] transition-all duration-300 flex flex-col cursor-pointer group"
+                >
+                  {/* Farm Header Banner with Map Accent */}
+                  <div className="h-32 w-full bg-gradient-to-br from-primary/90 via-primary to-primary-container relative overflow-hidden p-4 flex flex-col justify-between text-on-primary">
+                    {/* Background Pattern */}
+                    <div className="absolute right-0 bottom-0 opacity-15 pointer-events-none">
+                      <span className="material-symbols-outlined text-[90px]">map</span>
+                    </div>
+
+                    <div className="flex justify-between items-start z-10">
+                      <span className="px-2.5 py-0.5 bg-black/30 backdrop-blur-xs rounded-lg text-xs font-semibold flex items-center gap-1">
+                        <MapPin className="w-3 h-3 text-[#FFD54F]" />
+                        <span>
+                          {farm.latitude?.toFixed(4)}, {farm.longitude?.toFixed(4)}
+                        </span>
+                      </span>
+
+                      <span className="px-2.5 py-0.5 bg-surface/90 text-primary font-bold rounded-lg text-xs shadow-xs">
+                        {farm.area} {farm.areaUnit || 'Acres'}
+                      </span>
+                    </div>
+
+                    <div className="z-10">
+                      <h3 className="text-lg font-bold text-white group-hover:underline flex items-center gap-1.5">
+                        <span>{farm.name}</span>
+                        <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                      </h3>
+                    </div>
+                  </div>
+
+                  {/* Card Body */}
+                  <div className="p-4.5 flex flex-col flex-grow justify-between gap-4">
+                    <div className="grid grid-cols-2 gap-3 bg-surface-container-low p-3 rounded-xl border border-outline-variant/60">
+                      <div>
+                        <p className="text-[11px] text-on-surface-variant font-medium">Crops Planted</p>
+                        <p className="text-sm font-bold text-on-surface mt-0.5 flex items-center gap-1">
+                          <Sprout className="w-3.5 h-3.5 text-primary" />
+                          <span>{farmCrops.length} {farmCrops.length === 1 ? 'Crop' : 'Crops'}</span>
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-[11px] text-on-surface-variant font-medium">Avg Crop Health</p>
+                        <p className="text-sm font-bold text-primary mt-0.5 flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[#2E7D32]" />
+                          <span>{avgHealth}% Optimal</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="grid grid-cols-2 gap-2 pt-1">
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate('/diagnose', {
+                            state: { farmId: farm.id, farmName: farm.name },
+                          });
+                        }}
+                        variant="outlinePrimary"
+                        className="text-xs py-2 px-2.5 flex items-center justify-center gap-1.5"
+                      >
+                        <Scan className="w-3.5 h-3.5" />
+                        <span>Scan Crops</span>
+                      </Button>
+
+                      <Button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/farms/${farm.id}`);
+                        }}
+                        className="text-xs py-2 px-2.5 flex items-center justify-center gap-1.5"
+                      >
+                        <span>Open Farm</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </section>
 
-      {/* Add Crop Modal */}
-      <Modal
-        isOpen={isAddCropModalOpen}
-        onClose={() => setIsAddCropModalOpen(false)}
-        title="Add New Field Crop"
-        subtitle="Register a new crop plot into CropCare monitoring"
-      >
-        <form onSubmit={handleAddCropSubmit} className="flex flex-col gap-4 py-2">
-          <Input
-            label="Crop Name"
-            placeholder="e.g. Cotton, Mustard, Soybeans, Tomato"
-            value={newCropName}
-            onChange={(e) => setNewCropName(e.target.value)}
-            required
-          />
-
-          <Input
-            label="Variety / Hybrid Code"
-            placeholder="e.g. BT Cotton - RCH 659"
-            value={newCropVariety}
-            onChange={(e) => setNewCropVariety(e.target.value)}
-          />
-
-          <div className="grid grid-cols-2 gap-3">
-            <Input
-              label="Field / Zone"
-              placeholder="e.g. West Plot 2"
-              value={newCropField}
-              onChange={(e) => setNewCropField(e.target.value)}
-            />
-            <Input
-              label="Acreage (Acres)"
-              type="number"
-              step="0.5"
-              value={newCropAcres}
-              onChange={(e) => setNewCropAcres(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="flex gap-3 pt-3 border-t border-outline-variant">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsAddCropModalOpen(false)}
-              className="flex-1"
-            >
-              Cancel
-            </Button>
-            <Button type="submit" className="flex-1">
-              Add Crop
-            </Button>
-          </div>
-        </form>
-      </Modal>
+      {/* Add Farm Dialog Modal with Map Picker */}
+      <AddFarmModal
+        isOpen={isAddFarmModalOpen}
+        onClose={() => setIsAddFarmModalOpen(false)}
+      />
 
       {/* Soil Report Modal */}
       <Modal
@@ -457,7 +458,7 @@ export const DashboardPage = () => {
               Immediate Preventive Measures:
             </h4>
             <ul className="list-disc pl-5 space-y-1 text-xs">
-              <li>Inspect and clear North Field furrow outlets to prevent waterlogging.</li>
+              <li>Inspect and clear farm furrow outlets to prevent waterlogging.</li>
               <li>Postpone planned foliar spray or urea broadcast.</li>
               <li>Provide temporary physical staking if stem elongation is tall.</li>
             </ul>
@@ -467,11 +468,15 @@ export const DashboardPage = () => {
             <Button
               onClick={() => {
                 setIsStormAlertModalOpen(false);
-                navigate('/crops/wheat');
+                if (farms[0]?.id) {
+                  navigate(`/farms/${farms[0].id}`);
+                } else {
+                  navigate('/crops');
+                }
               }}
               className="flex-1"
             >
-              Open Wheat Field
+              Open Farm Holdings
             </Button>
           </div>
         </div>
@@ -479,3 +484,4 @@ export const DashboardPage = () => {
     </div>
   );
 };
+

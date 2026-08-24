@@ -25,6 +25,13 @@ export const cropService = {
     return getStoredCrops();
   },
 
+  async getCropsByFarm(farmId) {
+    await simulateNetworkDelay(200);
+    const crops = getStoredCrops();
+    if (!farmId) return crops;
+    return crops.filter((c) => c.farmId === farmId);
+  },
+
   async getCropById(cropId) {
     await simulateNetworkDelay(250);
     const crops = getStoredCrops();
@@ -41,6 +48,7 @@ export const cropService = {
     const crops = getStoredCrops();
     const newCrop = {
       id: `crop-${Date.now()}`,
+      farmId: newCropData.farmId || null,
       name: newCropData.name || 'New Crop',
       variety: newCropData.variety || 'Standard Hybrid',
       field: newCropData.field || 'Main Field',
@@ -125,7 +133,7 @@ export const cropService = {
     return updated.find((c) => c.id === cropId);
   },
 
-  async analyzeSoilReport(file) {
+  async analyzeSoilReport(_file) {
     await simulateNetworkDelay(1200);
     return {
       success: true,
@@ -134,3 +142,4 @@ export const cropService = {
     };
   }
 };
+
