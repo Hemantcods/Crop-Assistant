@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { weatherService } from '../services/weatherService';
-import { MOCK_ALERTS } from '../data/mockData';
+import { notificationService } from '../services/notificationService';
 
 const AlertsContext = createContext();
 
@@ -75,7 +75,7 @@ export const AlertsProvider = ({ children }) => {
   // Main initializer
   const fetchAlertsAndWeather = useCallback(async () => {
     try {
-      const alertsData = await weatherService.getAlerts();
+      const alertsData = await notificationService.getAll();
       setAlerts(alertsData);
 
       const useGps = localStorage.getItem('cropcare_use_current_location');
@@ -87,8 +87,8 @@ export const AlertsProvider = ({ children }) => {
         await fetchWeather(savedLoc);
       }
     } catch (err) {
-      console.error('Error initializing alerts or weather:', err);
-      setAlerts(MOCK_ALERTS);
+      console.error('Error initializing notifications or weather:', err);
+      setAlerts([]);
     }
   }, [detectLocationAndRefresh, fetchWeather]);
 
@@ -108,13 +108,18 @@ export const AlertsProvider = ({ children }) => {
   };
 
   const markAsRead = async (id) => {
-    const updated = await weatherService.markAlertAsRead(id);
-    setAlerts(updated);
+    const updated = await notificationService.markAsRead(id);
+    setAlerts((current) => current.map((alert) => (alert.id === id ? updated : alert)));
   };
 
   const dismissAlert = async (id) => {
-    const updated = await weatherService.dismissAlert(id);
-    setAlerts(updated);
+    await notificationService.dismiss(id);
+    setAlerts((current) => current.filter((alert) => alert.id !== id));
+  };
+
+  const markAllAsRead = async () => {
+    await notificationService.markAllAsRead();
+    setAlerts((current) => current.map((alert) => ({ ...alert, isRead: true })));
   };
 
   const unreadCount = alerts.filter((a) => !a.isRead).length;
@@ -136,6 +141,7 @@ export const AlertsProvider = ({ children }) => {
         setIsWeatherModalOpen,
         markAsRead,
         dismissAlert,
+        markAllAsRead,
         refreshAlerts: fetchAlertsAndWeather,
         refreshWeather: isUsingCurrentLocation ? () => detectLocationAndRefresh() : fetchWeather,
         setLocationAndRefresh,

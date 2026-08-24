@@ -18,10 +18,10 @@ import {
 
 export const AlertsPage = () => {
   const navigate = useNavigate();
-  const { alerts, markAsRead, dismissAlert } = useAlerts();
+  const { alerts, markAsRead, markAllAsRead, dismissAlert } = useAlerts();
   const { addToast } = useToast();
 
-  const [activeTab, setActiveTab] = useState('ALL'); // 'ALL' | 'weather' | 'disease' | 'market'
+  const [activeTab, setActiveTab] = useState('ALL');
 
   const filteredAlerts = alerts.filter((a) => {
     if (activeTab === 'ALL') return true;
@@ -30,8 +30,8 @@ export const AlertsPage = () => {
 
   const handleAction = (alert) => {
     markAsRead(alert.id);
-    if (alert.type === 'weather' || alert.cropId === 'wheat') {
-      navigate('/crops/wheat');
+    if (alert.type === 'weather' || alert.type === 'irrigation') {
+      navigate('/crops');
     } else if (alert.type === 'disease') {
       navigate('/diagnose');
     } else {
@@ -55,6 +55,14 @@ export const AlertsPage = () => {
             Real-time weather warnings, regional disease outbreaks, and agricultural market advisories.
           </p>
         </div>
+        <Button
+          onClick={markAllAsRead}
+          size="sm"
+          variant="secondary"
+          disabled={!alerts.some((alert) => !alert.isRead)}
+        >
+          <CheckCircle2 className="w-4 h-4 mr-1" /> Mark all read
+        </Button>
       </div>
 
       {/* Tabs Filter */}
@@ -63,7 +71,9 @@ export const AlertsPage = () => {
           { id: 'ALL', label: 'All Alerts' },
           { id: 'weather', label: 'Weather Warnings' },
           { id: 'disease', label: 'Disease & Pests' },
-          { id: 'market', label: 'Mandi Prices' },
+          { id: 'crop_health', label: 'Crop Health' },
+          { id: 'irrigation', label: 'Irrigation' },
+          { id: 'general', label: 'General' },
         ].map((tab) => (
           <button
             key={tab.id}
