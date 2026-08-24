@@ -1,0 +1,1284 @@
+import type * as runtime from "@prisma/client/runtime/client";
+import type * as Prisma from "../internal/prismaNamespace.js";
+/**
+ * Model MonitoringRecord
+ *
+ */
+export type MonitoringRecordModel = runtime.Types.Result.DefaultSelection<Prisma.$MonitoringRecordPayload>;
+export type AggregateMonitoringRecord = {
+    _count: MonitoringRecordCountAggregateOutputType | null;
+    _avg: MonitoringRecordAvgAggregateOutputType | null;
+    _sum: MonitoringRecordSumAggregateOutputType | null;
+    _min: MonitoringRecordMinAggregateOutputType | null;
+    _max: MonitoringRecordMaxAggregateOutputType | null;
+};
+export type MonitoringRecordAvgAggregateOutputType = {
+    healthScore: runtime.Decimal | null;
+};
+export type MonitoringRecordSumAggregateOutputType = {
+    healthScore: runtime.Decimal | null;
+};
+export type MonitoringRecordMinAggregateOutputType = {
+    id: string | null;
+    cropId: string | null;
+    healthScore: runtime.Decimal | null;
+    growthStage: string | null;
+    notes: string | null;
+    imageUrl: string | null;
+    createdAt: Date | null;
+};
+export type MonitoringRecordMaxAggregateOutputType = {
+    id: string | null;
+    cropId: string | null;
+    healthScore: runtime.Decimal | null;
+    growthStage: string | null;
+    notes: string | null;
+    imageUrl: string | null;
+    createdAt: Date | null;
+};
+export type MonitoringRecordCountAggregateOutputType = {
+    id: number;
+    cropId: number;
+    healthScore: number;
+    growthStage: number;
+    notes: number;
+    imageUrl: number;
+    createdAt: number;
+    _all: number;
+};
+export type MonitoringRecordAvgAggregateInputType = {
+    healthScore?: true;
+};
+export type MonitoringRecordSumAggregateInputType = {
+    healthScore?: true;
+};
+export type MonitoringRecordMinAggregateInputType = {
+    id?: true;
+    cropId?: true;
+    healthScore?: true;
+    growthStage?: true;
+    notes?: true;
+    imageUrl?: true;
+    createdAt?: true;
+};
+export type MonitoringRecordMaxAggregateInputType = {
+    id?: true;
+    cropId?: true;
+    healthScore?: true;
+    growthStage?: true;
+    notes?: true;
+    imageUrl?: true;
+    createdAt?: true;
+};
+export type MonitoringRecordCountAggregateInputType = {
+    id?: true;
+    cropId?: true;
+    healthScore?: true;
+    growthStage?: true;
+    notes?: true;
+    imageUrl?: true;
+    createdAt?: true;
+    _all?: true;
+};
+export type MonitoringRecordAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Filter which MonitoringRecord to aggregate.
+     */
+    where?: Prisma.MonitoringRecordWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of MonitoringRecords to fetch.
+     */
+    orderBy?: Prisma.MonitoringRecordOrderByWithRelationInput | Prisma.MonitoringRecordOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the start position
+     */
+    cursor?: Prisma.MonitoringRecordWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` MonitoringRecords from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` MonitoringRecords.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Count returned MonitoringRecords
+    **/
+    _count?: true | MonitoringRecordCountAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to average
+    **/
+    _avg?: MonitoringRecordAvgAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to sum
+    **/
+    _sum?: MonitoringRecordSumAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the minimum value
+    **/
+    _min?: MonitoringRecordMinAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the maximum value
+    **/
+    _max?: MonitoringRecordMaxAggregateInputType;
+};
+export type GetMonitoringRecordAggregateType<T extends MonitoringRecordAggregateArgs> = {
+    [P in keyof T & keyof AggregateMonitoringRecord]: P extends '_count' | 'count' ? T[P] extends true ? number : Prisma.GetScalarType<T[P], AggregateMonitoringRecord[P]> : Prisma.GetScalarType<T[P], AggregateMonitoringRecord[P]>;
+};
+export type MonitoringRecordGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.MonitoringRecordWhereInput;
+    orderBy?: Prisma.MonitoringRecordOrderByWithAggregationInput | Prisma.MonitoringRecordOrderByWithAggregationInput[];
+    by: Prisma.MonitoringRecordScalarFieldEnum[] | Prisma.MonitoringRecordScalarFieldEnum;
+    having?: Prisma.MonitoringRecordScalarWhereWithAggregatesInput;
+    take?: number;
+    skip?: number;
+    _count?: MonitoringRecordCountAggregateInputType | true;
+    _avg?: MonitoringRecordAvgAggregateInputType;
+    _sum?: MonitoringRecordSumAggregateInputType;
+    _min?: MonitoringRecordMinAggregateInputType;
+    _max?: MonitoringRecordMaxAggregateInputType;
+};
+export type MonitoringRecordGroupByOutputType = {
+    id: string;
+    cropId: string;
+    healthScore: runtime.Decimal | null;
+    growthStage: string | null;
+    notes: string | null;
+    imageUrl: string | null;
+    createdAt: Date;
+    _count: MonitoringRecordCountAggregateOutputType | null;
+    _avg: MonitoringRecordAvgAggregateOutputType | null;
+    _sum: MonitoringRecordSumAggregateOutputType | null;
+    _min: MonitoringRecordMinAggregateOutputType | null;
+    _max: MonitoringRecordMaxAggregateOutputType | null;
+};
+export type GetMonitoringRecordGroupByPayload<T extends MonitoringRecordGroupByArgs> = Prisma.PrismaPromise<Array<Prisma.PickEnumerable<MonitoringRecordGroupByOutputType, T['by']> & {
+    [P in ((keyof T) & (keyof MonitoringRecordGroupByOutputType))]: P extends '_count' ? T[P] extends boolean ? number : Prisma.GetScalarType<T[P], MonitoringRecordGroupByOutputType[P]> : Prisma.GetScalarType<T[P], MonitoringRecordGroupByOutputType[P]>;
+}>>;
+export type MonitoringRecordWhereInput = {
+    AND?: Prisma.MonitoringRecordWhereInput | Prisma.MonitoringRecordWhereInput[];
+    OR?: Prisma.MonitoringRecordWhereInput[];
+    NOT?: Prisma.MonitoringRecordWhereInput | Prisma.MonitoringRecordWhereInput[];
+    id?: Prisma.StringFilter<"MonitoringRecord"> | string;
+    cropId?: Prisma.StringFilter<"MonitoringRecord"> | string;
+    healthScore?: Prisma.DecimalNullableFilter<"MonitoringRecord"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null;
+    growthStage?: Prisma.StringNullableFilter<"MonitoringRecord"> | string | null;
+    notes?: Prisma.StringNullableFilter<"MonitoringRecord"> | string | null;
+    imageUrl?: Prisma.StringNullableFilter<"MonitoringRecord"> | string | null;
+    createdAt?: Prisma.DateTimeFilter<"MonitoringRecord"> | Date | string;
+    crop?: Prisma.XOR<Prisma.CropScalarRelationFilter, Prisma.CropWhereInput>;
+};
+export type MonitoringRecordOrderByWithRelationInput = {
+    id?: Prisma.SortOrder;
+    cropId?: Prisma.SortOrder;
+    healthScore?: Prisma.SortOrderInput | Prisma.SortOrder;
+    growthStage?: Prisma.SortOrderInput | Prisma.SortOrder;
+    notes?: Prisma.SortOrderInput | Prisma.SortOrder;
+    imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    crop?: Prisma.CropOrderByWithRelationInput;
+};
+export type MonitoringRecordWhereUniqueInput = Prisma.AtLeast<{
+    id?: string;
+    AND?: Prisma.MonitoringRecordWhereInput | Prisma.MonitoringRecordWhereInput[];
+    OR?: Prisma.MonitoringRecordWhereInput[];
+    NOT?: Prisma.MonitoringRecordWhereInput | Prisma.MonitoringRecordWhereInput[];
+    cropId?: Prisma.StringFilter<"MonitoringRecord"> | string;
+    healthScore?: Prisma.DecimalNullableFilter<"MonitoringRecord"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null;
+    growthStage?: Prisma.StringNullableFilter<"MonitoringRecord"> | string | null;
+    notes?: Prisma.StringNullableFilter<"MonitoringRecord"> | string | null;
+    imageUrl?: Prisma.StringNullableFilter<"MonitoringRecord"> | string | null;
+    createdAt?: Prisma.DateTimeFilter<"MonitoringRecord"> | Date | string;
+    crop?: Prisma.XOR<Prisma.CropScalarRelationFilter, Prisma.CropWhereInput>;
+}, "id">;
+export type MonitoringRecordOrderByWithAggregationInput = {
+    id?: Prisma.SortOrder;
+    cropId?: Prisma.SortOrder;
+    healthScore?: Prisma.SortOrderInput | Prisma.SortOrder;
+    growthStage?: Prisma.SortOrderInput | Prisma.SortOrder;
+    notes?: Prisma.SortOrderInput | Prisma.SortOrder;
+    imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    _count?: Prisma.MonitoringRecordCountOrderByAggregateInput;
+    _avg?: Prisma.MonitoringRecordAvgOrderByAggregateInput;
+    _max?: Prisma.MonitoringRecordMaxOrderByAggregateInput;
+    _min?: Prisma.MonitoringRecordMinOrderByAggregateInput;
+    _sum?: Prisma.MonitoringRecordSumOrderByAggregateInput;
+};
+export type MonitoringRecordScalarWhereWithAggregatesInput = {
+    AND?: Prisma.MonitoringRecordScalarWhereWithAggregatesInput | Prisma.MonitoringRecordScalarWhereWithAggregatesInput[];
+    OR?: Prisma.MonitoringRecordScalarWhereWithAggregatesInput[];
+    NOT?: Prisma.MonitoringRecordScalarWhereWithAggregatesInput | Prisma.MonitoringRecordScalarWhereWithAggregatesInput[];
+    id?: Prisma.StringWithAggregatesFilter<"MonitoringRecord"> | string;
+    cropId?: Prisma.StringWithAggregatesFilter<"MonitoringRecord"> | string;
+    healthScore?: Prisma.DecimalNullableWithAggregatesFilter<"MonitoringRecord"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null;
+    growthStage?: Prisma.StringNullableWithAggregatesFilter<"MonitoringRecord"> | string | null;
+    notes?: Prisma.StringNullableWithAggregatesFilter<"MonitoringRecord"> | string | null;
+    imageUrl?: Prisma.StringNullableWithAggregatesFilter<"MonitoringRecord"> | string | null;
+    createdAt?: Prisma.DateTimeWithAggregatesFilter<"MonitoringRecord"> | Date | string;
+};
+export type MonitoringRecordCreateInput = {
+    id?: string;
+    healthScore?: runtime.Decimal | runtime.DecimalJsLike | number | string | null;
+    growthStage?: string | null;
+    notes?: string | null;
+    imageUrl?: string | null;
+    createdAt?: Date | string;
+    crop: Prisma.CropCreateNestedOneWithoutMonitoringRecordsInput;
+};
+export type MonitoringRecordUncheckedCreateInput = {
+    id?: string;
+    cropId: string;
+    healthScore?: runtime.Decimal | runtime.DecimalJsLike | number | string | null;
+    growthStage?: string | null;
+    notes?: string | null;
+    imageUrl?: string | null;
+    createdAt?: Date | string;
+};
+export type MonitoringRecordUpdateInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    healthScore?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null;
+    growthStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    crop?: Prisma.CropUpdateOneRequiredWithoutMonitoringRecordsNestedInput;
+};
+export type MonitoringRecordUncheckedUpdateInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    cropId?: Prisma.StringFieldUpdateOperationsInput | string;
+    healthScore?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null;
+    growthStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type MonitoringRecordCreateManyInput = {
+    id?: string;
+    cropId: string;
+    healthScore?: runtime.Decimal | runtime.DecimalJsLike | number | string | null;
+    growthStage?: string | null;
+    notes?: string | null;
+    imageUrl?: string | null;
+    createdAt?: Date | string;
+};
+export type MonitoringRecordUpdateManyMutationInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    healthScore?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null;
+    growthStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type MonitoringRecordUncheckedUpdateManyInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    cropId?: Prisma.StringFieldUpdateOperationsInput | string;
+    healthScore?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null;
+    growthStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type MonitoringRecordListRelationFilter = {
+    every?: Prisma.MonitoringRecordWhereInput;
+    some?: Prisma.MonitoringRecordWhereInput;
+    none?: Prisma.MonitoringRecordWhereInput;
+};
+export type MonitoringRecordOrderByRelationAggregateInput = {
+    _count?: Prisma.SortOrder;
+};
+export type MonitoringRecordCountOrderByAggregateInput = {
+    id?: Prisma.SortOrder;
+    cropId?: Prisma.SortOrder;
+    healthScore?: Prisma.SortOrder;
+    growthStage?: Prisma.SortOrder;
+    notes?: Prisma.SortOrder;
+    imageUrl?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+};
+export type MonitoringRecordAvgOrderByAggregateInput = {
+    healthScore?: Prisma.SortOrder;
+};
+export type MonitoringRecordMaxOrderByAggregateInput = {
+    id?: Prisma.SortOrder;
+    cropId?: Prisma.SortOrder;
+    healthScore?: Prisma.SortOrder;
+    growthStage?: Prisma.SortOrder;
+    notes?: Prisma.SortOrder;
+    imageUrl?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+};
+export type MonitoringRecordMinOrderByAggregateInput = {
+    id?: Prisma.SortOrder;
+    cropId?: Prisma.SortOrder;
+    healthScore?: Prisma.SortOrder;
+    growthStage?: Prisma.SortOrder;
+    notes?: Prisma.SortOrder;
+    imageUrl?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+};
+export type MonitoringRecordSumOrderByAggregateInput = {
+    healthScore?: Prisma.SortOrder;
+};
+export type MonitoringRecordCreateNestedManyWithoutCropInput = {
+    create?: Prisma.XOR<Prisma.MonitoringRecordCreateWithoutCropInput, Prisma.MonitoringRecordUncheckedCreateWithoutCropInput> | Prisma.MonitoringRecordCreateWithoutCropInput[] | Prisma.MonitoringRecordUncheckedCreateWithoutCropInput[];
+    connectOrCreate?: Prisma.MonitoringRecordCreateOrConnectWithoutCropInput | Prisma.MonitoringRecordCreateOrConnectWithoutCropInput[];
+    createMany?: Prisma.MonitoringRecordCreateManyCropInputEnvelope;
+    connect?: Prisma.MonitoringRecordWhereUniqueInput | Prisma.MonitoringRecordWhereUniqueInput[];
+};
+export type MonitoringRecordUncheckedCreateNestedManyWithoutCropInput = {
+    create?: Prisma.XOR<Prisma.MonitoringRecordCreateWithoutCropInput, Prisma.MonitoringRecordUncheckedCreateWithoutCropInput> | Prisma.MonitoringRecordCreateWithoutCropInput[] | Prisma.MonitoringRecordUncheckedCreateWithoutCropInput[];
+    connectOrCreate?: Prisma.MonitoringRecordCreateOrConnectWithoutCropInput | Prisma.MonitoringRecordCreateOrConnectWithoutCropInput[];
+    createMany?: Prisma.MonitoringRecordCreateManyCropInputEnvelope;
+    connect?: Prisma.MonitoringRecordWhereUniqueInput | Prisma.MonitoringRecordWhereUniqueInput[];
+};
+export type MonitoringRecordUpdateManyWithoutCropNestedInput = {
+    create?: Prisma.XOR<Prisma.MonitoringRecordCreateWithoutCropInput, Prisma.MonitoringRecordUncheckedCreateWithoutCropInput> | Prisma.MonitoringRecordCreateWithoutCropInput[] | Prisma.MonitoringRecordUncheckedCreateWithoutCropInput[];
+    connectOrCreate?: Prisma.MonitoringRecordCreateOrConnectWithoutCropInput | Prisma.MonitoringRecordCreateOrConnectWithoutCropInput[];
+    upsert?: Prisma.MonitoringRecordUpsertWithWhereUniqueWithoutCropInput | Prisma.MonitoringRecordUpsertWithWhereUniqueWithoutCropInput[];
+    createMany?: Prisma.MonitoringRecordCreateManyCropInputEnvelope;
+    set?: Prisma.MonitoringRecordWhereUniqueInput | Prisma.MonitoringRecordWhereUniqueInput[];
+    disconnect?: Prisma.MonitoringRecordWhereUniqueInput | Prisma.MonitoringRecordWhereUniqueInput[];
+    delete?: Prisma.MonitoringRecordWhereUniqueInput | Prisma.MonitoringRecordWhereUniqueInput[];
+    connect?: Prisma.MonitoringRecordWhereUniqueInput | Prisma.MonitoringRecordWhereUniqueInput[];
+    update?: Prisma.MonitoringRecordUpdateWithWhereUniqueWithoutCropInput | Prisma.MonitoringRecordUpdateWithWhereUniqueWithoutCropInput[];
+    updateMany?: Prisma.MonitoringRecordUpdateManyWithWhereWithoutCropInput | Prisma.MonitoringRecordUpdateManyWithWhereWithoutCropInput[];
+    deleteMany?: Prisma.MonitoringRecordScalarWhereInput | Prisma.MonitoringRecordScalarWhereInput[];
+};
+export type MonitoringRecordUncheckedUpdateManyWithoutCropNestedInput = {
+    create?: Prisma.XOR<Prisma.MonitoringRecordCreateWithoutCropInput, Prisma.MonitoringRecordUncheckedCreateWithoutCropInput> | Prisma.MonitoringRecordCreateWithoutCropInput[] | Prisma.MonitoringRecordUncheckedCreateWithoutCropInput[];
+    connectOrCreate?: Prisma.MonitoringRecordCreateOrConnectWithoutCropInput | Prisma.MonitoringRecordCreateOrConnectWithoutCropInput[];
+    upsert?: Prisma.MonitoringRecordUpsertWithWhereUniqueWithoutCropInput | Prisma.MonitoringRecordUpsertWithWhereUniqueWithoutCropInput[];
+    createMany?: Prisma.MonitoringRecordCreateManyCropInputEnvelope;
+    set?: Prisma.MonitoringRecordWhereUniqueInput | Prisma.MonitoringRecordWhereUniqueInput[];
+    disconnect?: Prisma.MonitoringRecordWhereUniqueInput | Prisma.MonitoringRecordWhereUniqueInput[];
+    delete?: Prisma.MonitoringRecordWhereUniqueInput | Prisma.MonitoringRecordWhereUniqueInput[];
+    connect?: Prisma.MonitoringRecordWhereUniqueInput | Prisma.MonitoringRecordWhereUniqueInput[];
+    update?: Prisma.MonitoringRecordUpdateWithWhereUniqueWithoutCropInput | Prisma.MonitoringRecordUpdateWithWhereUniqueWithoutCropInput[];
+    updateMany?: Prisma.MonitoringRecordUpdateManyWithWhereWithoutCropInput | Prisma.MonitoringRecordUpdateManyWithWhereWithoutCropInput[];
+    deleteMany?: Prisma.MonitoringRecordScalarWhereInput | Prisma.MonitoringRecordScalarWhereInput[];
+};
+export type MonitoringRecordCreateWithoutCropInput = {
+    id?: string;
+    healthScore?: runtime.Decimal | runtime.DecimalJsLike | number | string | null;
+    growthStage?: string | null;
+    notes?: string | null;
+    imageUrl?: string | null;
+    createdAt?: Date | string;
+};
+export type MonitoringRecordUncheckedCreateWithoutCropInput = {
+    id?: string;
+    healthScore?: runtime.Decimal | runtime.DecimalJsLike | number | string | null;
+    growthStage?: string | null;
+    notes?: string | null;
+    imageUrl?: string | null;
+    createdAt?: Date | string;
+};
+export type MonitoringRecordCreateOrConnectWithoutCropInput = {
+    where: Prisma.MonitoringRecordWhereUniqueInput;
+    create: Prisma.XOR<Prisma.MonitoringRecordCreateWithoutCropInput, Prisma.MonitoringRecordUncheckedCreateWithoutCropInput>;
+};
+export type MonitoringRecordCreateManyCropInputEnvelope = {
+    data: Prisma.MonitoringRecordCreateManyCropInput | Prisma.MonitoringRecordCreateManyCropInput[];
+    skipDuplicates?: boolean;
+};
+export type MonitoringRecordUpsertWithWhereUniqueWithoutCropInput = {
+    where: Prisma.MonitoringRecordWhereUniqueInput;
+    update: Prisma.XOR<Prisma.MonitoringRecordUpdateWithoutCropInput, Prisma.MonitoringRecordUncheckedUpdateWithoutCropInput>;
+    create: Prisma.XOR<Prisma.MonitoringRecordCreateWithoutCropInput, Prisma.MonitoringRecordUncheckedCreateWithoutCropInput>;
+};
+export type MonitoringRecordUpdateWithWhereUniqueWithoutCropInput = {
+    where: Prisma.MonitoringRecordWhereUniqueInput;
+    data: Prisma.XOR<Prisma.MonitoringRecordUpdateWithoutCropInput, Prisma.MonitoringRecordUncheckedUpdateWithoutCropInput>;
+};
+export type MonitoringRecordUpdateManyWithWhereWithoutCropInput = {
+    where: Prisma.MonitoringRecordScalarWhereInput;
+    data: Prisma.XOR<Prisma.MonitoringRecordUpdateManyMutationInput, Prisma.MonitoringRecordUncheckedUpdateManyWithoutCropInput>;
+};
+export type MonitoringRecordScalarWhereInput = {
+    AND?: Prisma.MonitoringRecordScalarWhereInput | Prisma.MonitoringRecordScalarWhereInput[];
+    OR?: Prisma.MonitoringRecordScalarWhereInput[];
+    NOT?: Prisma.MonitoringRecordScalarWhereInput | Prisma.MonitoringRecordScalarWhereInput[];
+    id?: Prisma.StringFilter<"MonitoringRecord"> | string;
+    cropId?: Prisma.StringFilter<"MonitoringRecord"> | string;
+    healthScore?: Prisma.DecimalNullableFilter<"MonitoringRecord"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null;
+    growthStage?: Prisma.StringNullableFilter<"MonitoringRecord"> | string | null;
+    notes?: Prisma.StringNullableFilter<"MonitoringRecord"> | string | null;
+    imageUrl?: Prisma.StringNullableFilter<"MonitoringRecord"> | string | null;
+    createdAt?: Prisma.DateTimeFilter<"MonitoringRecord"> | Date | string;
+};
+export type MonitoringRecordCreateManyCropInput = {
+    id?: string;
+    healthScore?: runtime.Decimal | runtime.DecimalJsLike | number | string | null;
+    growthStage?: string | null;
+    notes?: string | null;
+    imageUrl?: string | null;
+    createdAt?: Date | string;
+};
+export type MonitoringRecordUpdateWithoutCropInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    healthScore?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null;
+    growthStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type MonitoringRecordUncheckedUpdateWithoutCropInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    healthScore?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null;
+    growthStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type MonitoringRecordUncheckedUpdateManyWithoutCropInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    healthScore?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null;
+    growthStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type MonitoringRecordSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+    id?: boolean;
+    cropId?: boolean;
+    healthScore?: boolean;
+    growthStage?: boolean;
+    notes?: boolean;
+    imageUrl?: boolean;
+    createdAt?: boolean;
+    crop?: boolean | Prisma.CropDefaultArgs<ExtArgs>;
+}, ExtArgs["result"]["monitoringRecord"]>;
+export type MonitoringRecordSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+    id?: boolean;
+    cropId?: boolean;
+    healthScore?: boolean;
+    growthStage?: boolean;
+    notes?: boolean;
+    imageUrl?: boolean;
+    createdAt?: boolean;
+    crop?: boolean | Prisma.CropDefaultArgs<ExtArgs>;
+}, ExtArgs["result"]["monitoringRecord"]>;
+export type MonitoringRecordSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+    id?: boolean;
+    cropId?: boolean;
+    healthScore?: boolean;
+    growthStage?: boolean;
+    notes?: boolean;
+    imageUrl?: boolean;
+    createdAt?: boolean;
+    crop?: boolean | Prisma.CropDefaultArgs<ExtArgs>;
+}, ExtArgs["result"]["monitoringRecord"]>;
+export type MonitoringRecordSelectScalar = {
+    id?: boolean;
+    cropId?: boolean;
+    healthScore?: boolean;
+    growthStage?: boolean;
+    notes?: boolean;
+    imageUrl?: boolean;
+    createdAt?: boolean;
+};
+export type MonitoringRecordOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "cropId" | "healthScore" | "growthStage" | "notes" | "imageUrl" | "createdAt", ExtArgs["result"]["monitoringRecord"]>;
+export type MonitoringRecordInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    crop?: boolean | Prisma.CropDefaultArgs<ExtArgs>;
+};
+export type MonitoringRecordIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    crop?: boolean | Prisma.CropDefaultArgs<ExtArgs>;
+};
+export type MonitoringRecordIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    crop?: boolean | Prisma.CropDefaultArgs<ExtArgs>;
+};
+export type $MonitoringRecordPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    name: "MonitoringRecord";
+    objects: {
+        crop: Prisma.$CropPayload<ExtArgs>;
+    };
+    scalars: runtime.Types.Extensions.GetPayloadResult<{
+        id: string;
+        cropId: string;
+        healthScore: runtime.Decimal | null;
+        growthStage: string | null;
+        notes: string | null;
+        imageUrl: string | null;
+        createdAt: Date;
+    }, ExtArgs["result"]["monitoringRecord"]>;
+    composites: {};
+};
+export type MonitoringRecordGetPayload<S extends boolean | null | undefined | MonitoringRecordDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$MonitoringRecordPayload, S>;
+export type MonitoringRecordCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = Omit<MonitoringRecordFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+    select?: MonitoringRecordCountAggregateInputType | true;
+};
+export interface MonitoringRecordDelegate<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: {
+        types: Prisma.TypeMap<ExtArgs>['model']['MonitoringRecord'];
+        meta: {
+            name: 'MonitoringRecord';
+        };
+    };
+    /**
+     * Find zero or one MonitoringRecord that matches the filter.
+     * @param {MonitoringRecordFindUniqueArgs} args - Arguments to find a MonitoringRecord
+     * @example
+     * // Get one MonitoringRecord
+     * const monitoringRecord = await prisma.monitoringRecord.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MonitoringRecordFindUniqueArgs>(args: Prisma.SelectSubset<T, MonitoringRecordFindUniqueArgs<ExtArgs>>): Prisma.Prisma__MonitoringRecordClient<runtime.Types.Result.GetResult<Prisma.$MonitoringRecordPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find one MonitoringRecord that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MonitoringRecordFindUniqueOrThrowArgs} args - Arguments to find a MonitoringRecord
+     * @example
+     * // Get one MonitoringRecord
+     * const monitoringRecord = await prisma.monitoringRecord.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MonitoringRecordFindUniqueOrThrowArgs>(args: Prisma.SelectSubset<T, MonitoringRecordFindUniqueOrThrowArgs<ExtArgs>>): Prisma.Prisma__MonitoringRecordClient<runtime.Types.Result.GetResult<Prisma.$MonitoringRecordPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find the first MonitoringRecord that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MonitoringRecordFindFirstArgs} args - Arguments to find a MonitoringRecord
+     * @example
+     * // Get one MonitoringRecord
+     * const monitoringRecord = await prisma.monitoringRecord.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MonitoringRecordFindFirstArgs>(args?: Prisma.SelectSubset<T, MonitoringRecordFindFirstArgs<ExtArgs>>): Prisma.Prisma__MonitoringRecordClient<runtime.Types.Result.GetResult<Prisma.$MonitoringRecordPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find the first MonitoringRecord that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MonitoringRecordFindFirstOrThrowArgs} args - Arguments to find a MonitoringRecord
+     * @example
+     * // Get one MonitoringRecord
+     * const monitoringRecord = await prisma.monitoringRecord.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MonitoringRecordFindFirstOrThrowArgs>(args?: Prisma.SelectSubset<T, MonitoringRecordFindFirstOrThrowArgs<ExtArgs>>): Prisma.Prisma__MonitoringRecordClient<runtime.Types.Result.GetResult<Prisma.$MonitoringRecordPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find zero or more MonitoringRecords that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MonitoringRecordFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MonitoringRecords
+     * const monitoringRecords = await prisma.monitoringRecord.findMany()
+     *
+     * // Get first 10 MonitoringRecords
+     * const monitoringRecords = await prisma.monitoringRecord.findMany({ take: 10 })
+     *
+     * // Only select the `id`
+     * const monitoringRecordWithIdOnly = await prisma.monitoringRecord.findMany({ select: { id: true } })
+     *
+     */
+    findMany<T extends MonitoringRecordFindManyArgs>(args?: Prisma.SelectSubset<T, MonitoringRecordFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MonitoringRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>;
+    /**
+     * Create a MonitoringRecord.
+     * @param {MonitoringRecordCreateArgs} args - Arguments to create a MonitoringRecord.
+     * @example
+     * // Create one MonitoringRecord
+     * const MonitoringRecord = await prisma.monitoringRecord.create({
+     *   data: {
+     *     // ... data to create a MonitoringRecord
+     *   }
+     * })
+     *
+     */
+    create<T extends MonitoringRecordCreateArgs>(args: Prisma.SelectSubset<T, MonitoringRecordCreateArgs<ExtArgs>>): Prisma.Prisma__MonitoringRecordClient<runtime.Types.Result.GetResult<Prisma.$MonitoringRecordPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Create many MonitoringRecords.
+     * @param {MonitoringRecordCreateManyArgs} args - Arguments to create many MonitoringRecords.
+     * @example
+     * // Create many MonitoringRecords
+     * const monitoringRecord = await prisma.monitoringRecord.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     */
+    createMany<T extends MonitoringRecordCreateManyArgs>(args?: Prisma.SelectSubset<T, MonitoringRecordCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    /**
+     * Create many MonitoringRecords and returns the data saved in the database.
+     * @param {MonitoringRecordCreateManyAndReturnArgs} args - Arguments to create many MonitoringRecords.
+     * @example
+     * // Create many MonitoringRecords
+     * const monitoringRecord = await prisma.monitoringRecord.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     * // Create many MonitoringRecords and only return the `id`
+     * const monitoringRecordWithIdOnly = await prisma.monitoringRecord.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     *
+     */
+    createManyAndReturn<T extends MonitoringRecordCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, MonitoringRecordCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MonitoringRecordPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>;
+    /**
+     * Delete a MonitoringRecord.
+     * @param {MonitoringRecordDeleteArgs} args - Arguments to delete one MonitoringRecord.
+     * @example
+     * // Delete one MonitoringRecord
+     * const MonitoringRecord = await prisma.monitoringRecord.delete({
+     *   where: {
+     *     // ... filter to delete one MonitoringRecord
+     *   }
+     * })
+     *
+     */
+    delete<T extends MonitoringRecordDeleteArgs>(args: Prisma.SelectSubset<T, MonitoringRecordDeleteArgs<ExtArgs>>): Prisma.Prisma__MonitoringRecordClient<runtime.Types.Result.GetResult<Prisma.$MonitoringRecordPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Update one MonitoringRecord.
+     * @param {MonitoringRecordUpdateArgs} args - Arguments to update one MonitoringRecord.
+     * @example
+     * // Update one MonitoringRecord
+     * const monitoringRecord = await prisma.monitoringRecord.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    update<T extends MonitoringRecordUpdateArgs>(args: Prisma.SelectSubset<T, MonitoringRecordUpdateArgs<ExtArgs>>): Prisma.Prisma__MonitoringRecordClient<runtime.Types.Result.GetResult<Prisma.$MonitoringRecordPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Delete zero or more MonitoringRecords.
+     * @param {MonitoringRecordDeleteManyArgs} args - Arguments to filter MonitoringRecords to delete.
+     * @example
+     * // Delete a few MonitoringRecords
+     * const { count } = await prisma.monitoringRecord.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     *
+     */
+    deleteMany<T extends MonitoringRecordDeleteManyArgs>(args?: Prisma.SelectSubset<T, MonitoringRecordDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    /**
+     * Update zero or more MonitoringRecords.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MonitoringRecordUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MonitoringRecords
+     * const monitoringRecord = await prisma.monitoringRecord.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    updateMany<T extends MonitoringRecordUpdateManyArgs>(args: Prisma.SelectSubset<T, MonitoringRecordUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    /**
+     * Update zero or more MonitoringRecords and returns the data updated in the database.
+     * @param {MonitoringRecordUpdateManyAndReturnArgs} args - Arguments to update many MonitoringRecords.
+     * @example
+     * // Update many MonitoringRecords
+     * const monitoringRecord = await prisma.monitoringRecord.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     * // Update zero or more MonitoringRecords and only return the `id`
+     * const monitoringRecordWithIdOnly = await prisma.monitoringRecord.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     *
+     */
+    updateManyAndReturn<T extends MonitoringRecordUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, MonitoringRecordUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MonitoringRecordPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>;
+    /**
+     * Create or update one MonitoringRecord.
+     * @param {MonitoringRecordUpsertArgs} args - Arguments to update or create a MonitoringRecord.
+     * @example
+     * // Update or create a MonitoringRecord
+     * const monitoringRecord = await prisma.monitoringRecord.upsert({
+     *   create: {
+     *     // ... data to create a MonitoringRecord
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MonitoringRecord we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MonitoringRecordUpsertArgs>(args: Prisma.SelectSubset<T, MonitoringRecordUpsertArgs<ExtArgs>>): Prisma.Prisma__MonitoringRecordClient<runtime.Types.Result.GetResult<Prisma.$MonitoringRecordPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Count the number of MonitoringRecords.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MonitoringRecordCountArgs} args - Arguments to filter MonitoringRecords to count.
+     * @example
+     * // Count the number of MonitoringRecords
+     * const count = await prisma.monitoringRecord.count({
+     *   where: {
+     *     // ... the filter for the MonitoringRecords we want to count
+     *   }
+     * })
+    **/
+    count<T extends MonitoringRecordCountArgs>(args?: Prisma.Subset<T, MonitoringRecordCountArgs>): Prisma.PrismaPromise<T extends runtime.Types.Utils.Record<'select', any> ? T['select'] extends true ? number : Prisma.GetScalarType<T['select'], MonitoringRecordCountAggregateOutputType> : number>;
+    /**
+     * Allows you to perform aggregations operations on a MonitoringRecord.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MonitoringRecordAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MonitoringRecordAggregateArgs>(args: Prisma.Subset<T, MonitoringRecordAggregateArgs>): Prisma.PrismaPromise<GetMonitoringRecordAggregateType<T>>;
+    /**
+     * Group by MonitoringRecord.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MonitoringRecordGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     *
+    **/
+    groupBy<T extends MonitoringRecordGroupByArgs, HasSelectOrTake extends Prisma.Or<Prisma.Extends<'skip', Prisma.Keys<T>>, Prisma.Extends<'take', Prisma.Keys<T>>>, OrderByArg extends Prisma.True extends HasSelectOrTake ? {
+        orderBy: MonitoringRecordGroupByArgs['orderBy'];
+    } : {
+        orderBy?: MonitoringRecordGroupByArgs['orderBy'];
+    }, OrderFields extends Prisma.ExcludeUnderscoreKeys<Prisma.Keys<Prisma.MaybeTupleToUnion<T['orderBy']>>>, ByFields extends Prisma.MaybeTupleToUnion<T['by']>, ByValid extends Prisma.Has<ByFields, OrderFields>, HavingFields extends Prisma.GetHavingFields<T['having']>, HavingValid extends Prisma.Has<ByFields, HavingFields>, ByEmpty extends T['by'] extends never[] ? Prisma.True : Prisma.False, InputErrors extends ByEmpty extends Prisma.True ? `Error: "by" must not be empty.` : HavingValid extends Prisma.False ? {
+        [P in HavingFields]: P extends ByFields ? never : P extends string ? `Error: Field "${P}" used in "having" needs to be provided in "by".` : [
+            Error,
+            'Field ',
+            P,
+            ` in "having" needs to be provided in "by"`
+        ];
+    }[HavingFields] : 'take' extends Prisma.Keys<T> ? 'orderBy' extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
+        [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+    }[OrderFields] : 'Error: If you provide "take", you also need to provide "orderBy"' : 'skip' extends Prisma.Keys<T> ? 'orderBy' extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
+        [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+    }[OrderFields] : 'Error: If you provide "skip", you also need to provide "orderBy"' : ByValid extends Prisma.True ? {} : {
+        [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+    }[OrderFields]>(args: Prisma.SubsetIntersection<T, MonitoringRecordGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMonitoringRecordGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>;
+    /**
+     * Fields of the MonitoringRecord model
+     */
+    readonly fields: MonitoringRecordFieldRefs;
+}
+/**
+ * The delegate class that acts as a "Promise-like" for MonitoringRecord.
+ * Why is this prefixed with `Prisma__`?
+ * Because we want to prevent naming conflicts as mentioned in
+ * https://github.com/prisma/prisma-client-js/issues/707
+ */
+export interface Prisma__MonitoringRecordClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise";
+    crop<T extends Prisma.CropDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CropDefaultArgs<ExtArgs>>): Prisma.Prisma__CropClient<runtime.Types.Result.GetResult<Prisma.$CropPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): runtime.Types.Utils.JsPromise<TResult1 | TResult2>;
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): runtime.Types.Utils.JsPromise<T | TResult>;
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): runtime.Types.Utils.JsPromise<T>;
+}
+/**
+ * Fields of the MonitoringRecord model
+ */
+export interface MonitoringRecordFieldRefs {
+    readonly id: Prisma.FieldRef<"MonitoringRecord", 'String'>;
+    readonly cropId: Prisma.FieldRef<"MonitoringRecord", 'String'>;
+    readonly healthScore: Prisma.FieldRef<"MonitoringRecord", 'Decimal'>;
+    readonly growthStage: Prisma.FieldRef<"MonitoringRecord", 'String'>;
+    readonly notes: Prisma.FieldRef<"MonitoringRecord", 'String'>;
+    readonly imageUrl: Prisma.FieldRef<"MonitoringRecord", 'String'>;
+    readonly createdAt: Prisma.FieldRef<"MonitoringRecord", 'DateTime'>;
+}
+/**
+ * MonitoringRecord findUnique
+ */
+export type MonitoringRecordFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MonitoringRecord
+     */
+    select?: Prisma.MonitoringRecordSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the MonitoringRecord
+     */
+    omit?: Prisma.MonitoringRecordOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.MonitoringRecordInclude<ExtArgs> | null;
+    /**
+     * Filter, which MonitoringRecord to fetch.
+     */
+    where: Prisma.MonitoringRecordWhereUniqueInput;
+};
+/**
+ * MonitoringRecord findUniqueOrThrow
+ */
+export type MonitoringRecordFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MonitoringRecord
+     */
+    select?: Prisma.MonitoringRecordSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the MonitoringRecord
+     */
+    omit?: Prisma.MonitoringRecordOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.MonitoringRecordInclude<ExtArgs> | null;
+    /**
+     * Filter, which MonitoringRecord to fetch.
+     */
+    where: Prisma.MonitoringRecordWhereUniqueInput;
+};
+/**
+ * MonitoringRecord findFirst
+ */
+export type MonitoringRecordFindFirstArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MonitoringRecord
+     */
+    select?: Prisma.MonitoringRecordSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the MonitoringRecord
+     */
+    omit?: Prisma.MonitoringRecordOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.MonitoringRecordInclude<ExtArgs> | null;
+    /**
+     * Filter, which MonitoringRecord to fetch.
+     */
+    where?: Prisma.MonitoringRecordWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of MonitoringRecords to fetch.
+     */
+    orderBy?: Prisma.MonitoringRecordOrderByWithRelationInput | Prisma.MonitoringRecordOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for MonitoringRecords.
+     */
+    cursor?: Prisma.MonitoringRecordWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` MonitoringRecords from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` MonitoringRecords.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of MonitoringRecords.
+     */
+    distinct?: Prisma.MonitoringRecordScalarFieldEnum | Prisma.MonitoringRecordScalarFieldEnum[];
+};
+/**
+ * MonitoringRecord findFirstOrThrow
+ */
+export type MonitoringRecordFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MonitoringRecord
+     */
+    select?: Prisma.MonitoringRecordSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the MonitoringRecord
+     */
+    omit?: Prisma.MonitoringRecordOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.MonitoringRecordInclude<ExtArgs> | null;
+    /**
+     * Filter, which MonitoringRecord to fetch.
+     */
+    where?: Prisma.MonitoringRecordWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of MonitoringRecords to fetch.
+     */
+    orderBy?: Prisma.MonitoringRecordOrderByWithRelationInput | Prisma.MonitoringRecordOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for MonitoringRecords.
+     */
+    cursor?: Prisma.MonitoringRecordWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` MonitoringRecords from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` MonitoringRecords.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of MonitoringRecords.
+     */
+    distinct?: Prisma.MonitoringRecordScalarFieldEnum | Prisma.MonitoringRecordScalarFieldEnum[];
+};
+/**
+ * MonitoringRecord findMany
+ */
+export type MonitoringRecordFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MonitoringRecord
+     */
+    select?: Prisma.MonitoringRecordSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the MonitoringRecord
+     */
+    omit?: Prisma.MonitoringRecordOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.MonitoringRecordInclude<ExtArgs> | null;
+    /**
+     * Filter, which MonitoringRecords to fetch.
+     */
+    where?: Prisma.MonitoringRecordWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of MonitoringRecords to fetch.
+     */
+    orderBy?: Prisma.MonitoringRecordOrderByWithRelationInput | Prisma.MonitoringRecordOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for listing MonitoringRecords.
+     */
+    cursor?: Prisma.MonitoringRecordWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` MonitoringRecords from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` MonitoringRecords.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of MonitoringRecords.
+     */
+    distinct?: Prisma.MonitoringRecordScalarFieldEnum | Prisma.MonitoringRecordScalarFieldEnum[];
+};
+/**
+ * MonitoringRecord create
+ */
+export type MonitoringRecordCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MonitoringRecord
+     */
+    select?: Prisma.MonitoringRecordSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the MonitoringRecord
+     */
+    omit?: Prisma.MonitoringRecordOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.MonitoringRecordInclude<ExtArgs> | null;
+    /**
+     * The data needed to create a MonitoringRecord.
+     */
+    data: Prisma.XOR<Prisma.MonitoringRecordCreateInput, Prisma.MonitoringRecordUncheckedCreateInput>;
+};
+/**
+ * MonitoringRecord createMany
+ */
+export type MonitoringRecordCreateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MonitoringRecords.
+     */
+    data: Prisma.MonitoringRecordCreateManyInput | Prisma.MonitoringRecordCreateManyInput[];
+    skipDuplicates?: boolean;
+};
+/**
+ * MonitoringRecord createManyAndReturn
+ */
+export type MonitoringRecordCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MonitoringRecord
+     */
+    select?: Prisma.MonitoringRecordSelectCreateManyAndReturn<ExtArgs> | null;
+    /**
+     * Omit specific fields from the MonitoringRecord
+     */
+    omit?: Prisma.MonitoringRecordOmit<ExtArgs> | null;
+    /**
+     * The data used to create many MonitoringRecords.
+     */
+    data: Prisma.MonitoringRecordCreateManyInput | Prisma.MonitoringRecordCreateManyInput[];
+    skipDuplicates?: boolean;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.MonitoringRecordIncludeCreateManyAndReturn<ExtArgs> | null;
+};
+/**
+ * MonitoringRecord update
+ */
+export type MonitoringRecordUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MonitoringRecord
+     */
+    select?: Prisma.MonitoringRecordSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the MonitoringRecord
+     */
+    omit?: Prisma.MonitoringRecordOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.MonitoringRecordInclude<ExtArgs> | null;
+    /**
+     * The data needed to update a MonitoringRecord.
+     */
+    data: Prisma.XOR<Prisma.MonitoringRecordUpdateInput, Prisma.MonitoringRecordUncheckedUpdateInput>;
+    /**
+     * Choose, which MonitoringRecord to update.
+     */
+    where: Prisma.MonitoringRecordWhereUniqueInput;
+};
+/**
+ * MonitoringRecord updateMany
+ */
+export type MonitoringRecordUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MonitoringRecords.
+     */
+    data: Prisma.XOR<Prisma.MonitoringRecordUpdateManyMutationInput, Prisma.MonitoringRecordUncheckedUpdateManyInput>;
+    /**
+     * Filter which MonitoringRecords to update
+     */
+    where?: Prisma.MonitoringRecordWhereInput;
+    /**
+     * Limit how many MonitoringRecords to update.
+     */
+    limit?: number;
+};
+/**
+ * MonitoringRecord updateManyAndReturn
+ */
+export type MonitoringRecordUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MonitoringRecord
+     */
+    select?: Prisma.MonitoringRecordSelectUpdateManyAndReturn<ExtArgs> | null;
+    /**
+     * Omit specific fields from the MonitoringRecord
+     */
+    omit?: Prisma.MonitoringRecordOmit<ExtArgs> | null;
+    /**
+     * The data used to update MonitoringRecords.
+     */
+    data: Prisma.XOR<Prisma.MonitoringRecordUpdateManyMutationInput, Prisma.MonitoringRecordUncheckedUpdateManyInput>;
+    /**
+     * Filter which MonitoringRecords to update
+     */
+    where?: Prisma.MonitoringRecordWhereInput;
+    /**
+     * Limit how many MonitoringRecords to update.
+     */
+    limit?: number;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.MonitoringRecordIncludeUpdateManyAndReturn<ExtArgs> | null;
+};
+/**
+ * MonitoringRecord upsert
+ */
+export type MonitoringRecordUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MonitoringRecord
+     */
+    select?: Prisma.MonitoringRecordSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the MonitoringRecord
+     */
+    omit?: Prisma.MonitoringRecordOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.MonitoringRecordInclude<ExtArgs> | null;
+    /**
+     * The filter to search for the MonitoringRecord to update in case it exists.
+     */
+    where: Prisma.MonitoringRecordWhereUniqueInput;
+    /**
+     * In case the MonitoringRecord found by the `where` argument doesn't exist, create a new MonitoringRecord with this data.
+     */
+    create: Prisma.XOR<Prisma.MonitoringRecordCreateInput, Prisma.MonitoringRecordUncheckedCreateInput>;
+    /**
+     * In case the MonitoringRecord was found with the provided `where` argument, update it with this data.
+     */
+    update: Prisma.XOR<Prisma.MonitoringRecordUpdateInput, Prisma.MonitoringRecordUncheckedUpdateInput>;
+};
+/**
+ * MonitoringRecord delete
+ */
+export type MonitoringRecordDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MonitoringRecord
+     */
+    select?: Prisma.MonitoringRecordSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the MonitoringRecord
+     */
+    omit?: Prisma.MonitoringRecordOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.MonitoringRecordInclude<ExtArgs> | null;
+    /**
+     * Filter which MonitoringRecord to delete.
+     */
+    where: Prisma.MonitoringRecordWhereUniqueInput;
+};
+/**
+ * MonitoringRecord deleteMany
+ */
+export type MonitoringRecordDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Filter which MonitoringRecords to delete
+     */
+    where?: Prisma.MonitoringRecordWhereInput;
+    /**
+     * Limit how many MonitoringRecords to delete.
+     */
+    limit?: number;
+};
+/**
+ * MonitoringRecord without action
+ */
+export type MonitoringRecordDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MonitoringRecord
+     */
+    select?: Prisma.MonitoringRecordSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the MonitoringRecord
+     */
+    omit?: Prisma.MonitoringRecordOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.MonitoringRecordInclude<ExtArgs> | null;
+};
+//# sourceMappingURL=MonitoringRecord.d.ts.map

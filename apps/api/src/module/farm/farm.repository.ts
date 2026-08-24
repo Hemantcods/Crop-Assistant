@@ -1,5 +1,7 @@
 import { CreateFarmInput, UpdateFarmInput } from "shared";
 import { prisma } from "db";
+import type { Prisma } from "db";
+
 export class FarmRepository {
   async create(userId: string, data: CreateFarmInput) {
     return prisma.farm.create({
@@ -31,7 +33,7 @@ export class FarmRepository {
       },
     });
   }
-  async update(farmId: string, userId: string, input: UpdateFarmInput) {
+  async update(farmId: string, userId: string, input: UpdateFarmInput): Promise<Prisma.BatchPayload> {
     return prisma.farm.updateMany({
       where: {
         id: farmId,
@@ -40,7 +42,7 @@ export class FarmRepository {
       data: input,
     });
   }
-  async delete(farmId: string, userId: string) {
+  async delete(farmId: string, userId: string): Promise<Prisma.BatchPayload> {
     return prisma.farm.deleteMany({
       where: {
         id: farmId,
