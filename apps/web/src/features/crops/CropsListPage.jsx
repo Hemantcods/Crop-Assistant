@@ -3,31 +3,24 @@ import { useNavigate } from 'react-router-dom';
 import { useCrops } from '../../context/CropContext';
 import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
-import { Modal } from '../../components/common/Modal';
-import { Input } from '../../components/common/Input';
+import { AddCropModal } from '../../components/common/AddCropModal';
 import { useToast } from '../../components/common/Toast';
-import { Search, PlusCircle, ArrowRight, Filter, Sprout } from 'lucide-react';
-import confetti from 'canvas-confetti';
+import { Search, PlusCircle, ArrowRight } from 'lucide-react';
 
 export const CropsListPage = () => {
   const navigate = useNavigate();
-  const { crops, addCrop } = useCrops();
+  const { crops, farms } = useCrops();
   const { addToast } = useToast();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL'); // 'ALL' | 'Healthy' | 'Attention'
   const [isAddCropModalOpen, setIsAddCropModalOpen] = useState(false);
 
-  const [name, setName] = useState('');
-  const [variety, setVariety] = useState('');
-  const [field, setField] = useState('');
-  const [acres, setAcres] = useState('2.5');
-
   const filteredCrops = crops.filter((crop) => {
     const matchesSearch =
       crop.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      crop.variety.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      crop.field.toLowerCase().includes(searchTerm.toLowerCase());
+      crop.variety?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      crop.field?.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus =
       statusFilter === 'ALL' ||
@@ -36,18 +29,6 @@ export const CropsListPage = () => {
 
     return matchesSearch && matchesStatus;
   });
-
-  const handleAddSubmit = async (e) => {
-    e.preventDefault();
-    if (!name) return;
-    const created = await addCrop({ name, variety, field, acres });
-    confetti({ particleCount: 50, spread: 60 });
-    addToast({ title: 'Crop Added', message: `${created.name} registered.`, type: 'success' });
-    setIsAddCropModalOpen(false);
-    setName('');
-    setVariety('');
-    setField('');
-  };
 
   return (
     <div className="flex flex-col gap-6 sm:gap-8">
@@ -63,7 +44,18 @@ export const CropsListPage = () => {
         </div>
 
         <Button
-          onClick={() => setIsAddCropModalOpen(true)}
+          onClick={() => {
+            if (farms.length === 0) {
+              addToast({
+                title: 'No Farms Found',
+                message: 'Please create a farm holding first from the Home page.',
+                type: 'info',
+              });
+              navigate('/');
+              return;
+            }
+            setIsAddCropModalOpen(true);
+          }}
           icon={<PlusCircle className="w-4 h-4" />}
           className="w-full sm:w-auto"
         >
@@ -158,58 +150,11 @@ export const CropsListPage = () => {
         ))}
       </div>
 
-      {/* Add Crop Modal */}
-      <Modal
+      {/* Reusable Add Crop Modal */}
+      <AddCropModal
         isOpen={isAddCropModalOpen}
         onClose={() => setIsAddCropModalOpen(false)}
-        title="Add New Field Crop"
-        subtitle="Register plot into CropCare AI monitoring"
-      >
-        <form onSubmit={handleAddSubmit} className="flex flex-col gap-4 py-2">
-          <Input
-            label="Crop Name"
-            placeholder="e.g. Cotton, Mustard, Potato"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          <Input
-            label="Variety"
-            placeholder="e.g. Sharbati Gold HD 2967"
-            value={variety}
-            onChange={(e) => setVariety(e.target.value)}
-          />
-          <div className="grid grid-cols-2 gap-3">
-            <Input
-              label="Field / Plot"
-              placeholder="e.g. North Ridge Plot 1"
-              value={field}
-              onChange={(e) => setField(e.target.value)}
-            />
-            <Input
-              label="Acres"
-              type="number"
-              step="0.5"
-              value={acres}
-              onChange={(e) => setAcres(e.target.value)}
-              required
-            />
-          </div>
-          <div className="flex gap-3 pt-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsAddCropModalOpen(false)}
-              className="flex-1"
-            >
-              Cancel
-            </Button>
-            <Button type="submit" className="flex-1">
-              Save Crop
-            </Button>
-          </div>
-        </form>
-      </Modal>
+      />
     </div>
   );
 };

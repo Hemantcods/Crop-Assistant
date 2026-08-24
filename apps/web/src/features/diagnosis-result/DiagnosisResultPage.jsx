@@ -24,7 +24,7 @@ import confetti from 'canvas-confetti';
 export const DiagnosisResultPage = () => {
   const navigate = useNavigate();
   const { currentDiagnosis } = useDiagnosis();
-  const { addCrop } = useCrops();
+  const { addCrop, farms } = useCrops();
   const { addToast } = useToast();
 
   const [showHeatmap, setShowHeatmap] = useState(true);
@@ -58,22 +58,39 @@ export const DiagnosisResultPage = () => {
   };
 
   const handleAddToMonitoring = async () => {
-    await addCrop({
-      name: `${diag.cropName?.split(' ')[0] || 'Target Crop'} - Monitored Plot`,
-      variety: diag.scientificName || 'Standard',
-      field: 'Monitored Disease Zone',
-      acres: '2.0',
-      status: diag.severity === 'Healthy' ? 'Healthy' : 'Attention Needed',
-      statusVariant: diag.severity === 'Healthy' ? 'success' : 'warning',
-      imageUrl: diag.image,
-    });
-    confetti({ particleCount: 60, spread: 60 });
-    addToast({
-      title: 'Added to Monitoring',
-      message: `${diag.title} is now tracked in your active farm dashboard.`,
-      type: 'success',
-    });
-    navigate('/crops');
+    const targetFarmId = farms[0]?.id;
+    if (!targetFarmId) {
+      addToast({
+        title: 'Farm Required',
+        message: 'Please create a farm holding first from the Home page.',
+        type: 'info',
+      });
+      return;
+    }
+
+    try {
+      await addCrop({
+        farmId: targetFarmId,
+        name: `${diag.cropName?.split(' ')[0] || 'Target Crop'} - Monitored Plot`,
+        variety: diag.scientificName || 'Standard Hybrid',
+        platedAt: new Date().toISOString(),
+        status: diag.severity === 'Healthy' ? 'ACTIVE' : 'FAILED',
+        imageUrl: diag.image,
+      });
+      confetti({ particleCount: 60, spread: 60 });
+      addToast({
+        title: 'Added to Monitoring',
+        message: `${diag.cropName || 'Crop'} is now tracked in your active farm dashboard.`,
+        type: 'success',
+      });
+      navigate('/crops');
+    } catch (err) {
+      addToast({
+        title: 'Could Not Add Crop',
+        message: err.message || 'Failed to add crop to monitoring.',
+        type: 'error',
+      });
+    }
   };
 
   return (

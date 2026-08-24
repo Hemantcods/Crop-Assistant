@@ -96,6 +96,11 @@ export const AuthProvider = ({ children }) => {
     return updated;
   };
 
+  // Refresh Tokens
+  const refreshTokens = async () => {
+    return authService.refreshTokens();
+  };
+
   // Logout
   const logout = async () => {
     await authService.logout();
@@ -115,6 +120,7 @@ export const AuthProvider = ({ children }) => {
         loginWithGoogle,
         loginAsDemo,
         updateProfile,
+        refreshTokens,
         logout,
       }}
     >

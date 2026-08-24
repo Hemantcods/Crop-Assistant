@@ -8,6 +8,7 @@ import { Input } from '../../components/common/Input';
 import { Badge } from '../../components/common/Badge';
 import { weatherService } from '../../services/weatherService';
 import { farmService } from '../../services/farmService';
+import { AddCropModal } from '../../components/common/AddCropModal';
 import {
   ArrowLeft,
   MapPin,
@@ -27,12 +28,11 @@ import {
   Compass,
   Loader2,
 } from 'lucide-react';
-import confetti from 'canvas-confetti';
 
 export const FarmDetailPage = () => {
   const { farmId } = useParams();
   const navigate = useNavigate();
-  const { getFarmById, getCropsByFarmId, addCrop, deleteFarm, isLoading: isContextLoading } = useCrops();
+  const { getFarmById, getCropsByFarmId, deleteFarm, isLoading: isContextLoading } = useCrops();
   const { addToast } = useToast();
 
   const contextFarm = getFarmById(farmId);
@@ -50,10 +50,6 @@ export const FarmDetailPage = () => {
 
   // Add Crop Modal state
   const [isAddCropModalOpen, setIsAddCropModalOpen] = useState(false);
-  const [cropName, setCropName] = useState('');
-  const [cropVariety, setCropVariety] = useState('');
-  const [cropAcres, setCropAcres] = useState('2.0');
-  const [cropPlotField, setCropPlotField] = useState('');
 
   // Delete Farm Modal
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -150,35 +146,6 @@ export const FarmDetailPage = () => {
 
     return matchesSearch && matchesStatus;
   });
-
-  const handleAddCropSubmit = async (e) => {
-    e.preventDefault();
-    if (!cropName.trim()) {
-      addToast({ title: 'Crop Name Required', message: 'Please enter crop name.', type: 'error' });
-      return;
-    }
-
-    const created = await addCrop({
-      farmId: farm.id,
-      name: cropName.trim(),
-      variety: cropVariety.trim() || 'Standard Hybrid',
-      field: cropPlotField.trim() || `${farm.name} - Plot 1`,
-      acres: parseFloat(cropAcres) || 1.0,
-    });
-
-    confetti({ particleCount: 50, spread: 60 });
-    addToast({
-      title: 'Crop Added to Farm!',
-      message: `${created.name} successfully registered in ${farm.name}.`,
-      type: 'success',
-    });
-
-    setIsAddCropModalOpen(false);
-    setCropName('');
-    setCropVariety('');
-    setCropPlotField('');
-    setCropAcres('2.0');
-  };
 
   const handleDeleteFarm = async () => {
     await deleteFarm(farm.id);
@@ -550,62 +517,12 @@ export const FarmDetailPage = () => {
       </section>
 
       {/* Add Crop Modal */}
-      <Modal
+      <AddCropModal
         isOpen={isAddCropModalOpen}
         onClose={() => setIsAddCropModalOpen(false)}
-        title={`Add Crop to ${farm.name}`}
-        subtitle="Register a new crop plot into CropCare AI monitoring"
-      >
-        <form onSubmit={handleAddCropSubmit} className="flex flex-col gap-4 py-2">
-          <Input
-            label="Crop Name"
-            placeholder="e.g. Cotton, Mustard, Wheat, Tomato, Soybean"
-            value={cropName}
-            onChange={(e) => setCropName(e.target.value)}
-            required
-            autoFocus
-          />
-
-          <Input
-            label="Variety / Hybrid Code"
-            placeholder="e.g. BT Cotton - RCH 659, Sharbati Gold"
-            value={cropVariety}
-            onChange={(e) => setCropVariety(e.target.value)}
-          />
-
-          <div className="grid grid-cols-2 gap-3">
-            <Input
-              label="Field / Plot Zone"
-              placeholder={`e.g. ${farm.name} - Zone A`}
-              value={cropPlotField}
-              onChange={(e) => setCropPlotField(e.target.value)}
-            />
-            <Input
-              label="Acreage (Acres)"
-              type="number"
-              step="0.5"
-              min="0.1"
-              value={cropAcres}
-              onChange={(e) => setCropAcres(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="flex gap-3 pt-3 border-t border-outline-variant">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsAddCropModalOpen(false)}
-              className="flex-1"
-            >
-              Cancel
-            </Button>
-            <Button type="submit" className="flex-1">
-              Save Crop
-            </Button>
-          </div>
-        </form>
-      </Modal>
+        farmId={farm.id}
+        farmName={farm.name}
+      />
 
       {/* Delete Farm Confirmation Modal */}
       <Modal

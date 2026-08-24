@@ -85,11 +85,22 @@ export const authService = {
     return updated;
   },
 
-  // Log out current user
+  // Real backend Refresh Tokens: POST /auth/refresh
+  async refreshTokens() {
+    const response = await apiClient.post('/auth/refresh');
+    return response.data;
+  },
+
+  // Real backend Log out: POST /auth/logout
   async logout() {
-    await simulateNetworkDelay(200);
-    localStorage.removeItem('cropcare_auth_token');
-    localStorage.removeItem('cropcare_user');
+    try {
+      await apiClient.post('/auth/logout');
+    } catch (err) {
+      console.warn('[authService.logout] Backend logout request failed:', err.message);
+    } finally {
+      localStorage.removeItem('cropcare_auth_token');
+      localStorage.removeItem('cropcare_user');
+    }
     return { success: true };
   },
 
