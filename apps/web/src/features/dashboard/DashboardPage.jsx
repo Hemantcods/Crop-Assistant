@@ -406,7 +406,7 @@ export const DashboardPage = () => {
         {farms.length === 0 ? (
           <div className="bg-surface border-2 border-dashed border-outline-variant rounded-3xl p-8 sm:p-12 text-center flex flex-col items-center justify-center gap-5 shadow-xs">
             <div className="w-20 h-20 rounded-full bg-primary-container text-primary flex items-center justify-center shadow-inner">
-              <span className="material-symbols-outlined text-[40px]">agriculture</span>
+              <span className="material-symbols-outlined text-[40px] text-white">agriculture</span>
             </div>
 
             <div className="max-w-md">
