@@ -1,23 +1,7 @@
-<<<<<<< HEAD
-import z from "zod";
-
-export const notificationIdParamsSchema = z.object({
-  notificationId: z.uuid("Invalid notificationId"),
-});
-
-export const notificationPreferencesSchema = z.object({
-  whatsappEnabled: z.boolean().optional(),
-  diseaseAlerts: z.boolean().optional(),
-  weatherAlerts: z.boolean().optional(),
-  cropHealthAlerts: z.boolean().optional(),
-});
-
-export type NotificationPreferencesInput = z.infer<typeof notificationPreferencesSchema>;
-=======
 import { z } from "zod";
 
 export const notificationIdParamsSchema = z.object({
-  notificationId: z.uuid("Invalid notification id"),
+  notificationId: z.uuid("Invalid notificationId"),
 });
 
 export const notificationPreferencesSchema = z
@@ -31,9 +15,7 @@ export const notificationPreferencesSchema = z
     message: "At least one preference is required",
   });
 
-export type NotificationPreferencesInput = z.infer<
-  typeof notificationPreferencesSchema
->;
+export type NotificationPreferencesInput = z.infer<typeof notificationPreferencesSchema>;
 
 export const createNotificationSchema = z.object({
   type: z.enum(["DISEASE", "WEATHER", "CROP_HEALTH", "IRRIGATION", "GENERAL"]),
@@ -45,4 +27,3 @@ export const createNotificationSchema = z.object({
 });
 
 export type CreateNotificationInput = z.infer<typeof createNotificationSchema>;
->>>>>>> 28a498e97972aca31686ea1730eb074392a00c8a

@@ -1,19 +1,32 @@
+import { fileTypeFromBuffer } from "file-type";
 export type DiseasePrediction = {
   disease: string;
   confidence: number;
   modelVersion: string;
+  status: boolean;
+  advisory: {
+    treatment: string;
+    prevention: string;
+  };
 };
 
 export class MLClient {
   constructor(private readonly baseUrl: string) {}
   async predictDisease(file: Express.Multer.File): Promise<DiseasePrediction> {
     const formData = new FormData();
+    const type = await fileTypeFromBuffer(file.buffer);
+    if (
+      !type ||
+      !["image/jpeg", "image/png", "image/webp"].includes(type.mime)
+    ) {
+      throw new Error("Invalid image format");
+    }
     const blob = new Blob([new Uint8Array(file.buffer)], {
-      type: file.mimetype,
+      type: type.mime,
     });
-    formData.append("image", blob, file.originalname);
+    formData.append("file", blob, file.originalname);
 
-    const response = await fetch(`${this.baseUrl}/predict`, {
+    const response = await fetch(`${this.baseUrl}/disease/predict`, {
       method: "POST",
       body: formData,
     });

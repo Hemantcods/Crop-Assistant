@@ -6,8 +6,8 @@ export class DiagnosisController {
   constructor(private readonly diagnosisService: DiagnosisService) {}
 
   scanCrop = async (req: AuthRequest, res: Response) => {
-    const userId = req.user?.id!;
-    const cropId = req.params.cropId as string;
+    const userId = req.user?.id!; 
+    const cropId = req.query.cropId as string;
     const file = req.file!;
 
     const result = await this.diagnosisService.scanCrop(userId, cropId, file);

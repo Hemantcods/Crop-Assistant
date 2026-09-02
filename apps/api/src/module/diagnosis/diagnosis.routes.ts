@@ -2,7 +2,7 @@ import { Router } from "express";
 import { requireAuth } from "../../middleware/auth.middleware";
 import { validate } from "../../middleware/validate.middleware";
 import { upladImage } from "../../middleware/upload.middleware";
-import { scanIdParamsSchema, diagnosisIdParamsSchema } from "shared";
+import { scanIdParamsSchema, diagnosisIdParamsSchema, cropIdParamsSchema } from "shared";
 import { diagnosisController } from "./diagnosis.container";
 
 const router = Router({ mergeParams: true });
@@ -12,6 +12,7 @@ router.use(requireAuth);
 router.post(
   "/scan",
   upladImage.single("image"),
+  validate(cropIdParamsSchema,"query"),
   diagnosisController.scanCrop,
 );
 

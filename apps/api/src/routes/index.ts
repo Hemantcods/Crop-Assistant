@@ -4,6 +4,7 @@ import farmRoutes from "../module/farm/farm.routes";
 import cropRoutes from "../module/crop/crop.routes";
 import diagnosisRoutes from "../module/diagnosis/diagnosis.routes";
 import notificationRoutes from "../module/notification/notification.routes";
+
 const router = Router();
 
 router.get("/health", (_res, res) => {
@@ -18,4 +19,6 @@ router.use("/farm", farmRoutes);
 router.use("/farm/:farmId/crops", cropRoutes);
 router.use("/farm/:farmId/crops/:cropId", diagnosisRoutes);
 router.use("/notification", notificationRoutes);
+router.use("/diagnosis", diagnosisRoutes);
+
 export default router;

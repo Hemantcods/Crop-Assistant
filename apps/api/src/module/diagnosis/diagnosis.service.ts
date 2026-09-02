@@ -21,12 +21,10 @@ export class DiagnosisService {
     cropId: string,
     file: Express.Multer.File,
   ): Promise<{ scanId: string; prediction: { disease: string; confidence: number; modelVersion: string } }> {
-    const farm = await this.farmRepository.findById(cropId, userId);
-
+    const farm = await this.farmRepository.findBycropId(cropId, userId);
     if (!farm) {
       throw new AppError("Crop not found", 404);
     }
-
     const crop = await this.cropRepository.findCropById(cropId);
 
     if (!crop) {
@@ -39,6 +37,7 @@ export class DiagnosisService {
       throw new AppError("Crop not found", 404);
     }
 
+    // const prediction = await this.mlClient.predictDisease(file);
     const prediction = await this.mlClient.predictDisease(file);
 
     const scan = scanStore.store(

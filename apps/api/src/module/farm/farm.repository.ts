@@ -33,7 +33,23 @@ export class FarmRepository {
       },
     });
   }
-  async update(farmId: string, userId: string, input: UpdateFarmInput): Promise<Prisma.BatchPayload> {
+  async findBycropId(cropId: string, userId: string) {
+    return prisma.farm.findFirst({
+      where: {
+        userId,
+        crops: {
+          some: {
+            id: cropId,
+          },
+        },
+      },
+    });
+  }
+  async update(
+    farmId: string,
+    userId: string,
+    input: UpdateFarmInput,
+  ): Promise<Prisma.BatchPayload> {
     return prisma.farm.updateMany({
       where: {
         id: farmId,
