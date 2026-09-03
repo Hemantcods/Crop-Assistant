@@ -11,7 +11,7 @@ export const DiagnosisProvider = ({ children }) => {
   const [uploadedImage, setUploadedImage] = useState(null);
   const [scanHistory, setScanHistory] = useState(MOCK_SAMPLE_DIAGNOSES);
 
-  const startScan = async (imageDataOrPreset) => {
+  const startScan = async (cropId,imageDataOrPreset) => {
     setIsAnalyzing(true);
     setAnalyzingStep(1);
     if (typeof imageDataOrPreset === 'string' && imageDataOrPreset.startsWith('data:image')) {
@@ -26,10 +26,10 @@ export const DiagnosisProvider = ({ children }) => {
     setTimeout(() => setAnalyzingStep(3), 1200);
 
     try {
-      const result = await diagnosisService.runAiInference(imageDataOrPreset);
-      setCurrentDiagnosis(result);
-      setScanHistory((prev) => [result, ...prev.filter((d) => d.id !== result.id)]);
-      return result;
+      const response=await diagnosisService.runAiInference(cropId, imageDataOrPreset)
+      setCurrentDiagnosis(response);
+      setScanHistory((prev) => [response, ...prev.filter((d) => d.id !== response.id)]);
+      return response;
     } finally {
       setTimeout(() => {
         setIsAnalyzing(false);

@@ -100,7 +100,7 @@ export const DiagnosisResultPage = () => {
         {/* Severity Banner */}
         <div
           className={`inline-flex items-center gap-2 px-3 py-1 rounded-full mb-3.5 text-xs font-bold uppercase tracking-wider ${
-            diag.severity === 'Healthy'
+            diag.severity.charAt(0).toUpperCase()+diag.severity.slice(1)=== 'Healthy'
               ? 'bg-[#E8F5E9] text-[#2E7D32]'
               : 'bg-error-container text-on-error-container'
           }`}
@@ -109,7 +109,7 @@ export const DiagnosisResultPage = () => {
             {diag.severity === 'Healthy' ? 'check_circle' : 'warning'}
           </span>
           <span>{diag.severityText || `Severity: ${diag.severity}`}</span>
-          <span className="opacity-60">• Confidence: {diag.confidence}</span>
+          <span className="opacity-60">• Confidence: {(diag.confidence*100).toFixed(2)}%</span>
         </div>
 
         <h1 className="font-headline-lg-mobile text-2xl sm:text-3xl lg:text-4xl lg:font-headline-lg text-primary font-bold mb-1.5">
