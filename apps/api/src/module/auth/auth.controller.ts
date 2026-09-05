@@ -58,7 +58,7 @@ export class AuthController {
     const { accessToken, refreshToken } =
     await this.authService.gooleSignin(code);
     setAuthCookies(res, accessToken, refreshToken);
-    return res.redirect(`${env.FRONTEND_URL}/dashboard`);
+    return res.redirect(`${env.FRONTEND_URL}`);
   };
   logout = async (_req: Request, res: Response) => {
     clearCookies(res);
